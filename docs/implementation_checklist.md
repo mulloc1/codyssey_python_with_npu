@@ -71,8 +71,8 @@ chore: Mini NPU 과제 기본 실행 구조 점검
 
 | 구분 | 권장 경로 |
 |------|-----------|
-| 구현 | 예: `src/npu/grid.py` — `validate_square()`, `same_shape()` 등 순수 함수만 |
-| 테스트 | `tests/npu/test_grid.py` |
+| 구현 | 예: `src/npu/grid.py` — `validate_matrix(expected_size=None)`, `same_shape()` 등 순수 함수만 |
+| 테스트 | `tests/npu_tests/test_grid.py` (소스 패키지명 `npu`와 충돌 방지) |
 | 검증 예시 | 정상 정사각형 / 행 길이 불일치 / 빈 리스트 / 비정사각형 |
 
 - **원칙**: 입출력 없이 **순수 함수**로 두어 테스트가 쉽게 한다.
@@ -102,7 +102,7 @@ feat: N×N 배열 검증 및 공통 상수 정의
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/mac.py` — `compute_mac()` 만 담당 |
-| 테스트 | `tests/npu/test_mac.py` |
+| 테스트 | `tests/npu_tests/test_mac.py` |
 | 검증 예시 | `subject.md` 3×3 예시 2종(높은 점수 vs 낮은 점수), 크기 불일치 시 기대 예외/에러, 소수 포함 1~2케이스 |
 
 - **원칙**: NumPy 없이 루프 결과가 **손계산과 일치**하는지 고정 입력으로 검증.
@@ -133,7 +133,7 @@ feat: MAC 연산 코어 함수 구현
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/judgement.py` — `judge_cross_vs_x(score_cross, score_x, epsilon=1e-9)` |
-| 테스트 | `tests/npu/test_judgement.py` |
+| 테스트 | `tests/npu_tests/test_judgement.py` |
 | 검증 예시 | 동점(`|a-b| < eps`), Cross 우세, X 우세, 경계값(`|a-b| == eps`는 설계한 규칙대로 한 가지만 명시) |
 
 - **원칙**: 판정만 단위 테스트하고, 콘솔/JSON은 이 함수를 **호출만** 하게 한다.
@@ -206,7 +206,7 @@ feat: 3×3 콘솔 입력 모드 및 입력 검증 구현
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/labels.py` — `normalize_expected()`, `normalize_filter_key()` |
-| 테스트 | `tests/npu/test_labels.py` — 대소문자/공백이 과제 범위에 없다면 다루지 않음(과제에 있는 매핑만) |
+| 테스트 | `tests/npu_tests/test_labels.py` — 대소문자/공백이 과제 범위에 없다면 다루지 않음(과제에 있는 매핑만) |
 
 - **원칙**: 매핑 테이블은 **데이터 한 곳**에만 두고 테스트로 고정한다.
 
@@ -273,7 +273,7 @@ feat: data.json 일괄 판정 모드 및 스키마 검증 구현
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/benchmark.py` — `benchmark_mac(n, repeats=10, rng=...)` |
-| 테스트 | `tests/npu/test_benchmark.py` — **`unittest.mock.patch("time.perf_counter")`** 로 시간을 고정하고, 반복 호출 횟수·평균 계산식만 검증 |
+| 테스트 | `tests/npu_tests/test_benchmark.py` — **`unittest.mock.patch("time.perf_counter")`** 로 시간을 고정하고, 반복 호출 횟수·평균 계산식만 검증 |
 | 대안 | 반복을 `repeats=2`로 두는 **스모크**만 유닛에 넣고, 10회·ms 출력은 수동/통합 확인 |
 
 - **원칙**: 실제 wall-clock에 의존하면 CI/환경에 따라 떨릴 수 있다. **계산 로직**과 **측정 구간 호출 횟수**를 분리해 테스트한다.
@@ -354,7 +354,7 @@ test: 회귀 및 통합 스모크 보강
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/mac_flat.py` — `flatten()`, `compute_mac_flat()` |
-| 테스트 | `tests/npu/test_mac_flat.py` — 동일 입력에 대해 `compute_mac`과 결과가 일치해야 함 |
+| 테스트 | `tests/npu_tests/test_mac_flat.py` — 동일 입력에 대해 `compute_mac`과 결과가 일치해야 함 |
 
 권장 커밋 예시:
 
@@ -382,7 +382,7 @@ feat: 1차원 배열 기반 MAC 최적화(보너스) 구현
 | 구분 | 권장 경로 |
 |------|-----------|
 | 구현 | 예: `src/npu/pattern_gen.py` — `generate_cross(n)`, `generate_x(n)` |
-| 테스트 | `tests/npu/test_pattern_gen.py` — `N=3` 고정 입력으로 예상 배열과 일치 여부, 크기 검증 |
+| 테스트 | `tests/npu_tests/test_pattern_gen.py` — `N=3` 고정 입력으로 예상 배열과 일치 여부, 크기 검증 |
 
 - **원칙**: 생성 함수는 순수 함수로 두어 MAC 연산과 독립적으로 테스트한다.
 
