@@ -4,12 +4,23 @@ from npu_io.label_normalization import (
     normalize_expected_and_filter_key,
     normalize_filter_score_keys,
 )
+from npu_io.json_loader import iter_pattern_cases, load_json
 from npu_io.parse import ROW_FORMAT_ERROR_3, parse_row, read_square_matrix_lines
+from npu_io.schema import (
+    extract_size_from_pattern_key,
+    select_filters_for_size,
+    validate_pattern_and_filters,
+)
 
 __all__ = [
     "ROW_FORMAT_ERROR_3",
+    "extract_size_from_pattern_key",
+    "iter_pattern_cases",
+    "load_json",
     "normalize_expected_and_filter_key",
     "normalize_filter_score_keys",
     "parse_row",
     "read_square_matrix_lines",
+    "select_filters_for_size",
+    "validate_pattern_and_filters",
 ]

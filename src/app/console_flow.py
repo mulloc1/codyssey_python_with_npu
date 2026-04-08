@@ -4,14 +4,27 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
+from pathlib import Path
 
-from npu.constants import DEFAULT_EPSILON, LABEL_UNDECIDED
-from npu.judgement import judge_ab
+from npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
+from npu.judgement import judge_ab, judge_cross_vs_x
+from npu.labels import normalize_expected
 from npu.mac import compute_mac
+from npu_io.json_loader import iter_pattern_cases, load_json
+from npu_io.label_normalization import normalize_expected_and_filter_key
 from npu_io.parse import parse_row, read_square_matrix_lines
+from npu_io.schema import (
+    extract_size_from_pattern_key,
+    select_filters_for_size,
+    validate_pattern_and_filters,
+)
 
 
-from app.constants import MENU_USER_INPUT_3X3, MENU_JSON_ANALYSIS, MENU_PATTERN_GENERATOR
+from app.constants import (
+    MENU_JSON_ANALYSIS,
+    MENU_PATTERN_GENERATOR,
+    MENU_USER_INPUT_3X3,
+)
 
 
 def _prompt_choice(input_fn: Callable[[str], str]) -> str:
@@ -37,12 +50,14 @@ def run_main_menu(
             run_user_input_mode_3x3(reader)
             continue
         if choice == MENU_JSON_ANALYSIS:
-            print("\n아직 구현되지 않았습니다. (data.json 분석 모드)")
+            run_data_json_mode()
             continue
         if choice == MENU_PATTERN_GENERATOR:
             print("\n아직 구현되지 않았습니다. (패턴 자동 생성기)")
             continue
-        print(f"\n{MENU_USER_INPUT_3X3}, {MENU_JSON_ANALYSIS}, {MENU_PATTERN_GENERATOR} 중에서 입력해 주세요.")
+        print(
+            f"\n{MENU_USER_INPUT_3X3}, {MENU_JSON_ANALYSIS}, {MENU_PATTERN_GENERATOR} 중에서 입력해 주세요.",
+        )
 
 
 def _read_3x3_matrix_lines(label: str, reader: Callable[[str], str]) -> list[list[float]]:
@@ -86,6 +101,99 @@ def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
     print(f"MAC 점수 (필터 B): {score_b}")
     print(f"판정 결과: {verdict_display}")
     print(f"연산 시간: {elapsed_ms:.6f} ms (MAC 2회)")
+
+
+def run_data_json_mode(data_path: str | Path | None = None) -> None:
+    """data.json을 로드해 케이스별 판정/PASS-FAIL/요약을 출력한다."""
+    target_path = Path(data_path) if data_path is not None else Path(__file__).resolve().parents[2] / "data.json"
+
+    try:
+        data = load_json(target_path)
+    except Exception as e:  # noqa: BLE001
+        print(f"\n[data.json 로드 실패] {e}")
+        return
+
+    filters_section = data.get("filters")
+    if not isinstance(filters_section, dict):
+        print("\n[data.json 스키마 오류] 'filters' 섹션이 없거나 형식이 올바르지 않습니다.")
+        return
+
+    try:
+        pattern_cases = iter_pattern_cases(data)
+    except Exception as e:  # noqa: BLE001
+        print(f"\n[data.json 스키마 오류] {e}")
+        return
+
+    total = 0
+    passed = 0
+    failed = 0
+    failures: list[tuple[str, str]] = []
+
+    print(f"\n[data.json 분석 시작] path={target_path}")
+
+    for pattern_key, pattern_case in pattern_cases:
+        total += 1
+        try:
+            size = extract_size_from_pattern_key(pattern_key)
+            pattern_input = pattern_case["input"]
+            expected_raw = pattern_case["expected"]
+            if not isinstance(expected_raw, str):
+                raise ValueError("expected must be a string")
+
+            raw_filters = select_filters_for_size(filters_section, size=size)
+            normalized_filters: dict[str, list[list[float]]] = {}
+            for raw_filter_key, filter_matrix in raw_filters.items():
+                if not isinstance(raw_filter_key, str):
+                    raise ValueError("filter key must be a string")
+                _, normalized_filter_key = normalize_expected_and_filter_key(expected_raw, raw_filter_key)
+                if normalized_filter_key in normalized_filters:
+                    raise ValueError(
+                        f"duplicate normalized filter label: {normalized_filter_key}",
+                    )
+                normalized_filters[normalized_filter_key] = filter_matrix
+
+            normalized_expected = normalize_expected(expected_raw)
+            validate_pattern_and_filters(
+                pattern_input=pattern_input,
+                filters_by_label=normalized_filters,
+                expected_size=size,
+            )
+
+            if LABEL_CROSS not in normalized_filters or LABEL_X not in normalized_filters:
+                raise ValueError("both Cross and X filters are required for each size")
+
+            t0 = time.perf_counter()
+            score_cross = compute_mac(pattern_input, normalized_filters[LABEL_CROSS])
+            score_x = compute_mac(pattern_input, normalized_filters[LABEL_X])
+            t1 = time.perf_counter()
+            elapsed_ms = (t1 - t0) * 1000.0
+
+            verdict = judge_cross_vs_x(score_cross, score_x, epsilon=DEFAULT_EPSILON)
+            pass_fail = "PASS" if verdict == normalized_expected else "FAIL"
+            if pass_fail == "PASS":
+                passed += 1
+            else:
+                failed += 1
+                failures.append(
+                    (pattern_key, f"expected={normalized_expected}, verdict={verdict}"),
+                )
+
+            print(
+                f"- {pattern_key}: Cross={score_cross}, X={score_x}, verdict={verdict}, expected={normalized_expected} -> {pass_fail} ({elapsed_ms:.6f} ms)",
+            )
+        except Exception as e:  # noqa: BLE001
+            failed += 1
+            failures.append((pattern_key, str(e)))
+            print(f"- {pattern_key}: FAIL ({e})")
+
+    print("\n--- data.json 결과 요약 ---")
+    print(f"전체 테스트 수: {total}")
+    print(f"통과 수: {passed}")
+    print(f"실패 수: {failed}")
+    if failures:
+        print("실패 케이스:")
+        for key, reason in failures:
+            print(f"  - {key}: {reason}")
 
 
 def main() -> None:
