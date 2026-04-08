@@ -7,6 +7,7 @@ from npu.constants import (
     LABEL_X,
 )
 from npu.judgement import judge_ab, judge_cross_vs_x
+from npu.labels import normalize_expected, normalize_filter_key
 from npu.mac import compute_mac
 
 __all__ = [
@@ -16,5 +17,7 @@ __all__ = [
     "LABEL_X",
     "judge_ab",
     "judge_cross_vs_x",
+    "normalize_expected",
+    "normalize_filter_key",
     "compute_mac",
 ]
