@@ -6,6 +6,15 @@ from npu.constants import (
     LABEL_UNDECIDED,
     LABEL_X,
 )
+from npu.benchmark import (
+    benchmark_mac_average,
+    benchmark_mac_once,
+    benchmark_pair,
+    build_benchmark_rows,
+    build_cross_pattern,
+    build_x_pattern,
+    format_benchmark_table,
+)
 from npu.judgement import judge_ab, judge_cross_vs_x
 from npu.labels import normalize_expected, normalize_filter_key
 from npu.mac import compute_mac
@@ -15,6 +24,13 @@ __all__ = [
     "LABEL_CROSS",
     "LABEL_UNDECIDED",
     "LABEL_X",
+    "benchmark_mac_average",
+    "benchmark_mac_once",
+    "benchmark_pair",
+    "build_benchmark_rows",
+    "build_cross_pattern",
+    "build_x_pattern",
+    "format_benchmark_table",
     "judge_ab",
     "judge_cross_vs_x",
     "normalize_expected",

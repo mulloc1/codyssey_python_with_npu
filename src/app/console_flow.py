@@ -6,6 +6,12 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
+from npu.benchmark import (
+    build_benchmark_rows,
+    build_cross_pattern,
+    build_x_pattern,
+    format_benchmark_table,
+)
 from npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
 from npu.judgement import judge_ab, judge_cross_vs_x
 from npu.labels import normalize_expected
@@ -108,6 +114,12 @@ def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
     print(f"MAC 점수 (필터 B): {score_b}")
     print(f"판정 결과: {verdict_display}")
     print(f"연산 시간: {elapsed_ms:.6f} ms (MAC 2회)")
+    benchmark_rows = build_benchmark_rows(
+        [(3, pattern, filter_a, filter_b)],
+        repeats=10,
+    )
+    print("\n--- 성능 분석 (3×3) ---")
+    print(format_benchmark_table(benchmark_rows))
 
 
 def run_data_json_mode(data_path: str | Path | None = None) -> None:
@@ -135,6 +147,7 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
     passed = 0
     failed = 0
     failures: list[tuple[str, str]] = []
+    benchmark_rows: list[dict[str, float | int]] = []
 
     print(f"\n[data.json 분석 시작] path={target_path}")
 
@@ -201,6 +214,27 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
         print("실패 케이스:")
         for key, reason in failures:
             print(f"  - {key}: {reason}")
+
+    benchmark_cases: list[tuple[int, list[list[float]], list[list[float]], list[list[float]]]] = []
+    benchmark_cases.append((3, build_cross_pattern(3), build_cross_pattern(3), build_x_pattern(3)))
+    for size in (5, 13, 25):
+        try:
+            size_filters = select_filters_for_size(filters_section, size=size)
+            benchmark_cases.append(
+                (
+                    size,
+                    build_cross_pattern(size),
+                    size_filters["cross"],
+                    size_filters["x"],
+                ),
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"[성능 분석 제외] size_{size}: {e}")
+
+    if benchmark_cases:
+        benchmark_rows = build_benchmark_rows(benchmark_cases, repeats=10)
+        print("\n--- 성능 분석 (3×3, 5×5, 13×13, 25×25) ---")
+        print(format_benchmark_table(benchmark_rows))
 
 
 def main() -> None:
