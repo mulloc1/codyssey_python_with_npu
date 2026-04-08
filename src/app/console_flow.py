@@ -44,7 +44,10 @@ def run_main_menu(
         try:
             choice = _prompt_choice(reader)
         except EOFError:
-            print("\n종료합니다.")
+            print("\n입력이 중단되어 종료합니다.")
+            return
+        except KeyboardInterrupt:
+            print("\n입력이 중단되어 종료합니다.")
             return
         if choice == MENU_USER_INPUT_3X3:
             run_user_input_mode_3x3(reader)
@@ -80,12 +83,16 @@ def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
     """3×3 필터 A/B + 패턴 입력 후 MAC·판정·시간 출력."""
     read = reader or input
 
-    filter_a = _read_3x3_matrix_lines("필터 A (3×3)", read)
-    filter_b = _read_3x3_matrix_lines("필터 B (3×3)", read)
+    try:
+        filter_a = _read_3x3_matrix_lines("필터 A (3×3)", read)
+        filter_b = _read_3x3_matrix_lines("필터 B (3×3)", read)
 
-    print("\n[저장 확인] 필터 A, B가 올바르게 입력되었습니다. 패턴을 이어서 입력합니다.")
+        print("\n[저장 확인] 필터 A, B가 올바르게 입력되었습니다. 패턴을 이어서 입력합니다.")
 
-    pattern = _read_3x3_matrix_lines("패턴 (3×3)", read)
+        pattern = _read_3x3_matrix_lines("패턴 (3×3)", read)
+    except KeyboardInterrupt:
+        print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
+        return
 
     t0 = time.perf_counter()
     score_a = compute_mac(pattern, filter_a)
