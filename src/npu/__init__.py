@@ -6,7 +6,7 @@ from npu.constants import (
     LABEL_UNDECIDED,
     LABEL_X,
 )
-from npu.judgement import judge_cross_vs_x
+from npu.judgement import judge_ab, judge_cross_vs_x
 from npu.mac import compute_mac
 
 __all__ = [
@@ -14,6 +14,7 @@ __all__ = [
     "LABEL_CROSS",
     "LABEL_UNDECIDED",
     "LABEL_X",
+    "judge_ab",
     "judge_cross_vs_x",
     "compute_mac",
 ]

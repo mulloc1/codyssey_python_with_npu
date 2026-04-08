@@ -24,3 +24,23 @@ def judge_cross_vs_x(
     if score_cross > score_x:
         return LABEL_CROSS
     return LABEL_X
+
+
+def judge_ab(
+    score_a: int | float,
+    score_b: int | float,
+    epsilon: float = DEFAULT_EPSILON,
+) -> str:
+    """
+    모드 1(사용자 입력)용: 필터 A/B 점수를 비교해 A, B, UNDECIDED 중 하나를 반환한다.
+
+    동점 규칙은 judge_cross_vs_x와 동일(abs(diff) < epsilon).
+    """
+    if epsilon <= 0:
+        raise ValueError("epsilon must be greater than 0")
+
+    if abs(score_a - score_b) < epsilon:
+        return LABEL_UNDECIDED
+    if score_a > score_b:
+        return "A"
+    return "B"

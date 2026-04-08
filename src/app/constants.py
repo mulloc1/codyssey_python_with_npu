@@ -1,0 +1,5 @@
+"""콘솔 앱 메뉴 관련 상수."""
+
+MENU_USER_INPUT_3X3 = "1"
+MENU_JSON_ANALYSIS = "2"
+MENU_PATTERN_GENERATOR = "3"

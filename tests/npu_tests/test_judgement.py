@@ -12,7 +12,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from npu.constants import LABEL_CROSS, LABEL_UNDECIDED, LABEL_X  # noqa: E402
-from npu.judgement import judge_cross_vs_x  # noqa: E402
+from npu.judgement import judge_ab, judge_cross_vs_x  # noqa: E402
 
 
 class TestJudgeCrossVsX(unittest.TestCase):
@@ -41,6 +41,20 @@ class TestJudgeCrossVsX(unittest.TestCase):
             judge_cross_vs_x(1.0, 1.0, epsilon=0.0)
         with self.assertRaises(ValueError):
             judge_cross_vs_x(1.0, 1.0, epsilon=-1e-9)
+
+
+class TestJudgeAb(unittest.TestCase):
+    # 모드 1: A 점수가 더 크면 A를 반환해야 한다.
+    def test_returns_a_when_score_a_is_higher(self) -> None:
+        self.assertEqual(judge_ab(5.0, 1.0, epsilon=1e-9), "A")
+
+    # 모드 1: B 점수가 더 크면 B를 반환해야 한다.
+    def test_returns_b_when_score_b_is_higher(self) -> None:
+        self.assertEqual(judge_ab(1.0, 5.0, epsilon=1e-9), "B")
+
+    # 모드 1: epsilon 이내면 UNDECIDED(판정 불가)여야 한다.
+    def test_returns_undecided_when_within_epsilon(self) -> None:
+        self.assertEqual(judge_ab(1.0, 1.0 + 1e-10, epsilon=1e-9), LABEL_UNDECIDED)
 
 
 if __name__ == "__main__":
