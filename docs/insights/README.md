@@ -6,3 +6,4 @@
 |------|------|
 | [`discussion_summary.md`](discussion_summary.md) | MAC/NPU, 필터·입력 구분, GIL·스레드, 테스트(assert/print), 스모크 테스트 등 대화 요약 |
 | [`negative_score_policy.md`](negative_score_policy.md) | MAC 점수 음수 허용 여부에 대한 정책 쟁점, 옵션(A/B), 의사결정 체크리스트 |
+| [`cpu_gpu_npu_deep_learning.md`](cpu_gpu_npu_deep_learning.md) | CPU/GPU/NPU 아키텍처 차이, 딥러닝에서 CPU vs NPU·GPU vs NPU 관점의 NPU 필요성 정리 |

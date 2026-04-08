@@ -39,7 +39,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 - [ ] 프로젝트 실행 진입점(`main.py`)과 기본 폴더 구조를 확인한다.
 - [ ] `docs/subject.md`, `docs/testing_guidelines.md`, `docs/commit_guidelines.md`를 읽고 범위를 확정한다.
 - [ ] 커밋 메시지 규칙(`feat/fix/docs/test/refactor/chore`)을 먼저 정한다.
-- [ ] `src/` 패키지(예: `src/npu/`, `src/io/` 등)와 `tests/` 루트를 만든다.
+- [ ] `src/` 패키지(예: `src/npu/`, `src/npu_io/` 등)와 `tests/` 루트를 만든다. (표준 라이브러리 `io` 이름 충돌 방지)
 
 ### 유닛 분리·테스트
 
@@ -171,9 +171,9 @@ feat: epsilon 기반 판정 로직 구현
 
 | 구분 | 권장 경로 |
 |------|-----------|
-| 구현 | 예: `src/io/parse.py` — `parse_row(line, expected_count)`, `read_matrix_3x3_lines(lines)` 등 **문자열/리스트만** 다루는 함수 |
+| 구현 | 예: `src/npu_io/parse.py` — `parse_row(line, expected_count)`, `read_square_matrix_lines(lines)` 등 **문자열/리스트만** 다루는 함수 |
 | 구현 | 예: `src/app/console_flow.py` — `input()` 루프는 얇게, 검증은 `parse`로 위임 |
-| 테스트 | `tests/io/test_parse.py` — 잘못된 줄, 공백 여러 개, 음수/실수 등 |
+| 테스트 | `tests/npu_io_tests/test_parse.py` — 잘못된 줄, 공백 여러 개, 음수/실수 등 |
 | 테스트 | 콘솔 통합은 최소화하고, **순수 파서만** 유닛 테스트 |
 
 - **원칙**: `input()`을 직접 호출하는 코드는 유닛 테스트하기 어렵다. **한 줄 파싱·행 개수 검사**를 분리해 테스트한다.
@@ -240,10 +240,10 @@ feat: 라벨 정규화 규칙 적용
 
 | 구분 | 권장 경로 |
 |------|-----------|
-| 구현 | 예: `src/io/json_loader.py` — `load_json(path)`, `iter_pattern_cases(data)` |
-| 구현 | 예: `src/io/schema.py` — 키에서 `N` 추출, 필터 선택, 크기 검증 → **결과 객체 또는 `(ok, err)`** |
-| 테스트 | `tests/io/test_schema.py` — 키 파싱, 크기 불일치 |
-| 테스트 | `tests/io/test_json_loader.py` — `tempfile.NamedTemporaryFile`에 JSON 쓰고 로드 |
+| 구현 | 예: `src/npu_io/json_loader.py` — `load_json(path)`, `iter_pattern_cases(data)` |
+| 구현 | 예: `src/npu_io/schema.py` — 키에서 `N` 추출, 필터 선택, 크기 검증 → **결과 객체 또는 `(ok, err)`** |
+| 테스트 | `tests/npu_io_tests/test_schema.py` — 키 파싱, 크기 불일치 |
+| 테스트 | `tests/npu_io_tests/test_json_loader.py` — `tempfile.NamedTemporaryFile`에 JSON 쓰고 로드 |
 
 - **원칙**: 실제 `data.json` 경로에 의존하지 않고, **임시 파일**로 최소 스키마를 검증한다.
 
