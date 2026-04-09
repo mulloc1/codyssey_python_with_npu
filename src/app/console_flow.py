@@ -158,6 +158,8 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
             for raw_filter_key, filter_matrix in raw_filters.items():
                 if not isinstance(raw_filter_key, str):
                     raise ValueError("filter key must be a string")
+                # 입력: raw_filter_key="cross"
+                # 반환: normalized_filter_key="Cross"
                 _, normalized_filter_key = normalize_expected_and_filter_key(expected_raw, raw_filter_key)
                 if normalized_filter_key in normalized_filters:
                     raise ValueError(
@@ -165,6 +167,8 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
                     )
                 normalized_filters[normalized_filter_key] = filter_matrix
 
+            # 입력: expected_raw="+"
+            # 반환: normalized_expected="Cross"
             normalized_expected = normalize_expected(expected_raw)
             validate_pattern_and_filters(
                 pattern_input=pattern_input,
@@ -182,6 +186,8 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
             elapsed_ms = (t1 - t0) * 1000.0
 
             verdict = judge_cross_vs_x(score_cross, score_x, epsilon=DEFAULT_EPSILON)
+            # 입력: verdict="Cross", normalized_expected="Cross"
+            # 반환: pass_fail="PASS"
             pass_fail = "PASS" if verdict == normalized_expected else "FAIL"
             if pass_fail == "PASS":
                 passed += 1

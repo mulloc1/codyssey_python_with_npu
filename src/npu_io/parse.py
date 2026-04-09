@@ -12,6 +12,12 @@ def parse_row(line: str, expected_count: int = 3) -> list[float]:
     """
     공백으로 구분된 숫자 한 줄을 파싱한다.
 
+    예시:
+        입력: "0 1 0"
+        반환: [0.0, 1.0, 0.0]
+        입력: "  -1.5   2   0 "
+        반환: [-1.5, 2.0, 0.0]
+
     Raises:
         ValueError: 토큰 개수 불일치 또는 숫자 파싱 실패 시
     """
@@ -34,6 +40,10 @@ def _generic_row_error(expected_count: int) -> str:
 def read_square_matrix_lines(lines: list[str], size: int = 3) -> list[list[float]]:
     """
     정확히 size줄의 문자열을 정사각 행렬로 파싱한다.
+
+    예시:
+        입력: ["0 1 0", "1 1 1", "0 1 0"]
+        반환: [[0.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 0.0]]
 
     Raises:
         ValueError: 줄 개수 불일치 또는 행 파싱 실패
