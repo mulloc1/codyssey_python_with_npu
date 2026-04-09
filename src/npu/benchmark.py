@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from npu.mac import compute_mac
+from src.npu.mac import compute_mac
 
 
 def benchmark_mac_once(pattern: Any, filter_: Any) -> float:

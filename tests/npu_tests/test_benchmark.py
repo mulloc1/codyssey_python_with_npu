@@ -2,17 +2,10 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-from npu.benchmark import (  # noqa: E402
+from src.npu.benchmark import (
     benchmark_mac_average,
     benchmark_mac_once,
     benchmark_pair,
@@ -38,14 +31,14 @@ def _x_3() -> list[list[float]]:
 
 class TestBenchmarkCore(unittest.TestCase):
     def test_benchmark_mac_once_uses_perf_counter_delta(self) -> None:
-        with patch("npu.benchmark.time.perf_counter", side_effect=[1.0, 1.002]):
+        with patch("src.npu.benchmark.time.perf_counter", side_effect=[1.0, 1.002]):
             elapsed_ms = benchmark_mac_once(_cross_3(), _cross_3())
         self.assertAlmostEqual(elapsed_ms, 2.0, places=9)
 
     def test_benchmark_mac_average_returns_repeat_mean(self) -> None:
         # repeats=2, 각 반복에서 (1ms, 3ms) 구간
         with patch(
-            "npu.benchmark.time.perf_counter",
+            "src.npu.benchmark.time.perf_counter",
             side_effect=[0.0, 0.001, 1.0, 1.003],
         ):
             avg_ms = benchmark_mac_average(_cross_3(), _x_3(), repeats=2)
@@ -60,7 +53,7 @@ class TestBenchmarkCore(unittest.TestCase):
         # B 평균: (2ms + 2ms)/2 = 2ms
         # 총합: 3ms
         with patch(
-            "npu.benchmark.time.perf_counter",
+            "src.npu.benchmark.time.perf_counter",
             side_effect=[
                 0.0, 0.001, 1.0, 1.001,  # A repeats=2
                 2.0, 2.002, 3.0, 3.002,  # B repeats=2

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from npu.constants import LABEL_CROSS, LABEL_X
+from src.npu.constants import LABEL_CROSS, LABEL_X
 
 _EXPECTED_LABEL_MAP: dict[str, str] = {
     "+": LABEL_CROSS,

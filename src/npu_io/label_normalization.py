@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from npu.labels import normalize_expected, normalize_filter_key
+from src.npu.labels import normalize_expected, normalize_filter_key
 
 
 def normalize_expected_and_filter_key(expected: str, filter_key: str) -> tuple[str, str]:

@@ -6,18 +6,10 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 
-# 프로젝트 루트의 src를 import 경로에 추가 (unittest discover 시 PYTHONPATH 없이 동작)
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-from npu.constants import DEFAULT_EPSILON  # noqa: E402
-from npu.grid import same_shape, validate_matrix  # noqa: E402
+from src.npu.constants import DEFAULT_EPSILON
+from src.npu.grid import same_shape, validate_matrix
 
 
 def _zeros(n: int) -> list[list[int]]:

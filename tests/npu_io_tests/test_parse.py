@@ -2,16 +2,9 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-from npu_io.parse import ROW_FORMAT_ERROR_3, parse_row, read_square_matrix_lines  # noqa: E402
+from src.npu_io.parse import ROW_FORMAT_ERROR_3, parse_row, read_square_matrix_lines
 
 
 class TestParseRow(unittest.TestCase):

@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from npu.grid import validate_matrix
+from src.npu.grid import validate_matrix
 
 _PATTERN_KEY_RE = re.compile(r"^size_(\d+)_(\d+)$")
 

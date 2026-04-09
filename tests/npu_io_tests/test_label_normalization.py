@@ -2,17 +2,10 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-from npu.constants import LABEL_CROSS, LABEL_X  # noqa: E402
-from npu_io.label_normalization import (  # noqa: E402
+from src.npu.constants import LABEL_CROSS, LABEL_X
+from src.npu_io.label_normalization import (
     normalize_expected_and_filter_key,
     normalize_filter_score_keys,
 )

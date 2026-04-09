@@ -6,31 +6,31 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-from npu.benchmark import (
+from src.npu.benchmark import (
     build_benchmark_rows,
     build_cross_pattern,
     build_x_pattern,
     format_benchmark_table,
 )
-from npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
-from npu.judgement import judge_ab, judge_cross_vs_x
-from npu.labels import normalize_expected
-from npu.mac import compute_mac
-from npu_io.json_loader import iter_pattern_cases, load_json
-from npu_io.label_normalization import normalize_expected_and_filter_key
-from npu_io.parse import parse_row, read_square_matrix_lines
-from npu_io.schema import (
+from src.npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
+from src.npu.judgement import judge_ab, judge_cross_vs_x
+from src.npu.labels import normalize_expected
+from src.npu.mac import compute_mac
+from src.npu_io.json_loader import iter_pattern_cases, load_json
+from src.npu_io.label_normalization import normalize_expected_and_filter_key
+from src.npu_io.parse import parse_row, read_square_matrix_lines
+from src.npu_io.schema import (
     extract_size_from_pattern_key,
     select_filters_for_size,
     validate_pattern_and_filters,
 )
 
 
-from app.constants import (
+from src.app.constants import (
     MENU_JSON_ANALYSIS,
     MENU_USER_INPUT_3X3,
 )
-from app.report import summarize_results
+from src.app.report import summarize_results
 
 
 def _prompt_choice(input_fn: Callable[[str], str]) -> str:
@@ -48,10 +48,7 @@ def run_main_menu(
     while True:
         try:
             choice = _prompt_choice(reader)
-        except EOFError:
-            print("\n입력이 중단되어 종료합니다.")
-            return
-        except KeyboardInterrupt:
+        except (EOFError, KeyboardInterrupt):
             print("\n입력이 중단되어 종료합니다.")
             return
         if choice == MENU_USER_INPUT_3X3:

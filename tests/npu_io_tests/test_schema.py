@@ -2,16 +2,9 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
-from pathlib import Path
 
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-from npu_io.schema import (  # noqa: E402
+from src.npu_io.schema import (
     extract_size_from_pattern_key,
     select_filters_for_size,
     validate_pattern_and_filters,

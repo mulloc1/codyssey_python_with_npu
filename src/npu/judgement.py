@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
+from src.npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
 
 
 def judge_cross_vs_x(

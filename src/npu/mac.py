@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from npu.grid import validate_matrix
+from src.npu.grid import validate_matrix
 
 
 def compute_mac(pattern: Any, filter_: Any) -> float:
