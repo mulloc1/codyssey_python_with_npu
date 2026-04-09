@@ -18,11 +18,6 @@ from npu.benchmark import (
 from npu.judgement import judge_ab, judge_cross_vs_x
 from npu.labels import normalize_expected, normalize_filter_key
 from npu.mac import compute_mac
-from npu.pattern_generator import (
-    generate_cross_pattern,
-    generate_x_pattern,
-    validate_size,
-)
 
 __all__ = [
     "DEFAULT_EPSILON",
@@ -36,12 +31,9 @@ __all__ = [
     "build_cross_pattern",
     "build_x_pattern",
     "format_benchmark_table",
-    "generate_cross_pattern",
-    "generate_x_pattern",
     "judge_ab",
     "judge_cross_vs_x",
     "normalize_expected",
     "normalize_filter_key",
     "compute_mac",
-    "validate_size",
 ]
