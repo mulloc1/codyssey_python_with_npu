@@ -16,6 +16,7 @@ from npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
 from npu.judgement import judge_ab, judge_cross_vs_x
 from npu.labels import normalize_expected
 from npu.mac import compute_mac
+from npu.pattern_generator import generate_cross_pattern, generate_x_pattern, validate_size
 from npu_io.json_loader import iter_pattern_cases, load_json
 from npu_io.label_normalization import normalize_expected_and_filter_key
 from npu_io.parse import parse_row, read_square_matrix_lines
@@ -31,6 +32,7 @@ from app.constants import (
     MENU_PATTERN_GENERATOR,
     MENU_USER_INPUT_3X3,
 )
+from app.report import summarize_results
 
 
 def _prompt_choice(input_fn: Callable[[str], str]) -> str:
@@ -62,7 +64,7 @@ def run_main_menu(
             run_data_json_mode()
             continue
         if choice == MENU_PATTERN_GENERATOR:
-            print("\n아직 구현되지 않았습니다. (패턴 자동 생성기)")
+            run_pattern_generator_mode(reader)
             continue
         print(
             f"\n{MENU_USER_INPUT_3X3}, {MENU_JSON_ANALYSIS}, {MENU_PATTERN_GENERATOR} 중에서 입력해 주세요.",
@@ -206,14 +208,15 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
             failures.append((pattern_key, str(e)))
             print(f"- {pattern_key}: FAIL ({e})")
 
-    print("\n--- data.json 결과 요약 ---")
-    print(f"전체 테스트 수: {total}")
-    print(f"통과 수: {passed}")
-    print(f"실패 수: {failed}")
-    if failures:
-        print("실패 케이스:")
-        for key, reason in failures:
-            print(f"  - {key}: {reason}")
+    print()
+    print(
+        summarize_results(
+            total=total,
+            passed=passed,
+            failed=failed,
+            failures_detail=failures,
+        ),
+    )
 
     benchmark_cases: list[tuple[int, list[list[float]], list[list[float]], list[list[float]]]] = []
     benchmark_cases.append((3, build_cross_pattern(3), build_cross_pattern(3), build_x_pattern(3)))
@@ -235,6 +238,39 @@ def run_data_json_mode(data_path: str | Path | None = None) -> None:
         benchmark_rows = build_benchmark_rows(benchmark_cases, repeats=10)
         print("\n--- 성능 분석 (3×3, 5×5, 13×13, 25×25) ---")
         print(format_benchmark_table(benchmark_rows))
+
+
+def _format_pattern_lines(pattern: list[list[float]]) -> str:
+    return "\n".join(" ".join(str(int(v)) for v in row) for row in pattern)
+
+
+def run_pattern_generator_mode(
+    reader: Callable[[str], str] | None = None,
+) -> None:
+    """크기 N 입력으로 Cross/X 패턴을 생성해 출력한다."""
+    read = reader or input
+    try:
+        raw = read("\n생성할 패턴 크기 N(3 이상)을 입력하세요: ").strip()
+        size = int(raw)
+        validate_size(size)
+    except ValueError:
+        print("입력 형식 오류: 3 이상의 정수를 입력하세요.")
+        return
+    except KeyboardInterrupt:
+        print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
+        return
+    except EOFError:
+        print("\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
+        return
+
+    cross = generate_cross_pattern(size)
+    x_pattern = generate_x_pattern(size)
+
+    print(f"\n--- 생성 결과 ({size}x{size}) ---")
+    print("[Cross]")
+    print(_format_pattern_lines(cross))
+    print("\n[X]")
+    print(_format_pattern_lines(x_pattern))
 
 
 def main() -> None:
