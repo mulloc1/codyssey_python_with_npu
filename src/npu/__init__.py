@@ -17,7 +17,7 @@ from src.npu.benchmark import (
 )
 from src.npu.judgement import judge_ab, judge_cross_vs_x
 from src.npu.labels import normalize_expected, normalize_filter_key
-from src.npu.mac import compute_mac
+from src.npu.mac import compute_mac, compute_mac_checked, validate_mac_inputs
 
 __all__ = [
     "DEFAULT_EPSILON",
@@ -36,4 +36,6 @@ __all__ = [
     "normalize_expected",
     "normalize_filter_key",
     "compute_mac",
+    "compute_mac_checked",
+    "validate_mac_inputs",
 ]

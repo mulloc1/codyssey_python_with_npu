@@ -5,13 +5,14 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from src.npu.mac import compute_mac
+from src.npu.mac import compute_mac, validate_mac_inputs
 
 
 def benchmark_mac_once(lPattern: Any, lFilter: Any) -> float:
     """MAC 1회 실행 시간을 ms 단위로 반환한다."""
+    iSize = validate_mac_inputs(lPattern, lFilter)
     fStart = time.perf_counter()
-    compute_mac(lPattern, lFilter)
+    compute_mac(lPattern, lFilter, iSize)
     fEnd = time.perf_counter()
     return (fEnd - fStart) * 1000.0
 
@@ -20,9 +21,14 @@ def benchmark_mac_average(lPattern: Any, lFilter: Any, iRepeats: int = 10) -> fl
     """MAC 반복 실행 평균 시간을 ms 단위로 반환한다."""
     if iRepeats <= 0:
         raise ValueError("repeats must be greater than 0")
+
+    iSize = validate_mac_inputs(lPattern, lFilter)
     fTotalMs = 0.0
     for _ in range(iRepeats):
-        fTotalMs += benchmark_mac_once(lPattern, lFilter)
+        fStart = time.perf_counter()
+        compute_mac(lPattern, lFilter, iSize)
+        fEnd = time.perf_counter()
+        fTotalMs += (fEnd - fStart) * 1000.0
     return fTotalMs / iRepeats
 
 
