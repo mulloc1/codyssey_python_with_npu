@@ -11,9 +11,9 @@ from src.npu_io.schema import (
 )
 
 
-def _cross(n: int) -> list[list[float]]:
-    c = n // 2
-    return [[1.0 if (i == c or j == c) else 0.0 for j in range(n)] for i in range(n)]
+def _cross(iSize: int) -> list[list[float]]:
+    iCenter = iSize // 2
+    return [[1.0 if (i == iCenter or j == iCenter) else 0.0 for j in range(iSize)] for i in range(iSize)]
 
 
 class TestExtractSizeFromPatternKey(unittest.TestCase):
@@ -27,10 +27,10 @@ class TestExtractSizeFromPatternKey(unittest.TestCase):
 
 class TestSelectFiltersForSize(unittest.TestCase):
     def test_selects_filters_by_size(self) -> None:
-        filters = {"size_5": {"cross": _cross(5), "x": _cross(5)}}
-        selected = select_filters_for_size(filters, 5)
-        self.assertIn("cross", selected)
-        self.assertIn("x", selected)
+        dFilters = {"size_5": {"cross": _cross(5), "x": _cross(5)}}
+        dSelected = select_filters_for_size(dFilters, 5)
+        self.assertIn("cross", dSelected)
+        self.assertIn("x", dSelected)
 
     def test_raises_when_size_key_missing(self) -> None:
         with self.assertRaises(ValueError):
@@ -39,16 +39,16 @@ class TestSelectFiltersForSize(unittest.TestCase):
 
 class TestValidatePatternAndFilters(unittest.TestCase):
     def test_accepts_valid_shapes(self) -> None:
-        pattern = _cross(5)
-        filters = {"Cross": _cross(5), "X": _cross(5)}
-        validate_pattern_and_filters(pattern, filters, expected_size=5)
+        lPattern = _cross(5)
+        dFilters = {"Cross": _cross(5), "X": _cross(5)}
+        validate_pattern_and_filters(lPattern, dFilters, iExpectedSize=5)
 
     def test_raises_on_shape_mismatch(self) -> None:
-        pattern = _cross(5)
-        bad_filter = [[1.0, 0.0], [0.0, 1.0]]
-        filters = {"Cross": _cross(5), "X": bad_filter}
+        lPattern = _cross(5)
+        lBadFilter = [[1.0, 0.0], [0.0, 1.0]]
+        dFilters = {"Cross": _cross(5), "X": lBadFilter}
         with self.assertRaises(ValueError):
-            validate_pattern_and_filters(pattern, filters, expected_size=5)
+            validate_pattern_and_filters(lPattern, dFilters, iExpectedSize=5)
 
 
 if __name__ == "__main__":

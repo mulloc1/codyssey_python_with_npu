@@ -44,17 +44,17 @@ def run_main_menu(
     input_fn: Callable[[str], str] | None = None,
 ) -> None:
     """시작 메뉴 루프. 기본값은 내장 input()."""
-    reader = input_fn or input
+    fnReader = input_fn or input
     while True:
         try:
-            choice = _prompt_choice(reader)
+            sChoice = _prompt_choice(fnReader)
         except (EOFError, KeyboardInterrupt):
             print("\n입력이 중단되어 종료합니다.")
             return
-        if choice == MENU_USER_INPUT_3X3:
-            run_user_input_mode_3x3(reader)
+        if sChoice == MENU_USER_INPUT_3X3:
+            run_user_input_mode_3x3(fnReader)
             continue
-        if choice == MENU_JSON_ANALYSIS:
+        if sChoice == MENU_JSON_ANALYSIS:
             run_data_json_mode()
             continue
         print(
@@ -62,179 +62,178 @@ def run_main_menu(
         )
 
 
-def _read_3x3_matrix_lines(label: str, reader: Callable[[str], str]) -> list[list[float]]:
-    print(f"\n{label}")
+def _read_3x3_matrix_lines(sLabel: str, fnReader: Callable[[str], str]) -> list[list[float]]:
+    print(f"\n{sLabel}")
     print("각 줄에 3개의 숫자를 공백으로 구분해 입력하세요.")
-    lines: list[str] = []
+    lLines: list[str] = []
     for i in range(3):
         while True:
-            line = reader(f"  줄 {i + 1}/3: ")
+            sLine = fnReader(f"  줄 {i + 1}/3: ")
             try:
-                parse_row(line, expected_count=3)
-                lines.append(line)
+                parse_row(sLine, iExpectedCount=3)
+                lLines.append(sLine)
                 break
-            except ValueError as e:
-                print(e)
-    return read_square_matrix_lines(lines, size=3)
+            except ValueError as exc:
+                print(exc)
+    return read_square_matrix_lines(lLines, iSize=3)
 
 
 def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
     """3×3 필터 A/B + 패턴 입력 후 MAC·판정·시간 출력."""
-    read = reader or input
+    fnRead = reader or input
 
     try:
-        filter_a = _read_3x3_matrix_lines("필터 A (3×3)", read)
-        filter_b = _read_3x3_matrix_lines("필터 B (3×3)", read)
+        lFilterA = _read_3x3_matrix_lines("필터 A (3×3)", fnRead)
+        lFilterB = _read_3x3_matrix_lines("필터 B (3×3)", fnRead)
 
         print("\n[저장 확인] 필터 A, B가 올바르게 입력되었습니다. 패턴을 이어서 입력합니다.")
 
-        pattern = _read_3x3_matrix_lines("패턴 (3×3)", read)
+        lPattern = _read_3x3_matrix_lines("패턴 (3×3)", fnRead)
     except KeyboardInterrupt:
         print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
         return
 
-    t0 = time.perf_counter()
-    score_a = compute_mac(pattern, filter_a)
-    score_b = compute_mac(pattern, filter_b)
-    t1 = time.perf_counter()
-    elapsed_ms = (t1 - t0) * 1000.0
+    fStart = time.perf_counter()
+    fScoreA = compute_mac(lPattern, lFilterA)
+    fScoreB = compute_mac(lPattern, lFilterB)
+    fEnd = time.perf_counter()
+    fElapsedMs = (fEnd - fStart) * 1000.0
 
-    verdict = judge_ab(score_a, score_b, epsilon=DEFAULT_EPSILON)
-    verdict_display = "판정 불가" if verdict == LABEL_UNDECIDED else verdict
+    sVerdict = judge_ab(fScoreA, fScoreB, fEpsilon=DEFAULT_EPSILON)
+    sVerdictDisplay = "판정 불가" if sVerdict == LABEL_UNDECIDED else sVerdict
 
     print("\n--- 결과 ---")
-    print(f"MAC 점수 (필터 A): {score_a}")
-    print(f"MAC 점수 (필터 B): {score_b}")
-    print(f"판정 결과: {verdict_display}")
-    print(f"연산 시간: {elapsed_ms:.6f} ms (MAC 2회)")
-    benchmark_rows = build_benchmark_rows(
-        [(3, pattern, filter_a, filter_b)],
-        repeats=10,
+    print(f"MAC 점수 (필터 A): {fScoreA}")
+    print(f"MAC 점수 (필터 B): {fScoreB}")
+    print(f"판정 결과: {sVerdictDisplay}")
+    print(f"연산 시간: {fElapsedMs:.6f} ms (MAC 2회)")
+    lBenchmarkRows = build_benchmark_rows(
+        [(3, lPattern, lFilterA, lFilterB)],
+        iRepeats=10,
     )
     print("\n--- 성능 분석 (3×3) ---")
-    print(format_benchmark_table(benchmark_rows))
+    print(format_benchmark_table(lBenchmarkRows))
 
 
-def run_data_json_mode(data_path: str | Path | None = None) -> None:
+def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
     """data.json을 로드해 케이스별 판정/PASS-FAIL/요약을 출력한다."""
-    target_path = Path(data_path) if data_path is not None else Path(__file__).resolve().parents[2] / "data.json"
+    pTargetPath = Path(sDataPath) if sDataPath is not None else Path(__file__).resolve().parents[2] / "data.json"
 
     try:
-        data = load_json(target_path)
-    except Exception as e:  # noqa: BLE001
-        print(f"\n[data.json 로드 실패] {e}")
+        dData = load_json(pTargetPath)
+    except Exception as exc:  # noqa: BLE001
+        print(f"\n[data.json 로드 실패] {exc}")
         return
 
-    filters_section = data.get("filters")
-    if not isinstance(filters_section, dict):
+    dFiltersSection = dData.get("filters")
+    if not isinstance(dFiltersSection, dict):
         print("\n[data.json 스키마 오류] 'filters' 섹션이 없거나 형식이 올바르지 않습니다.")
         return
 
     try:
-        pattern_cases = iter_pattern_cases(data)
-    except Exception as e:  # noqa: BLE001
-        print(f"\n[data.json 스키마 오류] {e}")
+        lPatternCases = iter_pattern_cases(dData)
+    except Exception as exc:  # noqa: BLE001
+        print(f"\n[data.json 스키마 오류] {exc}")
         return
 
-    total = 0
-    passed = 0
-    failed = 0
-    failures: list[tuple[str, str]] = []
-    benchmark_rows: list[dict[str, float | int]] = []
+    iTotal = 0
+    iPassed = 0
+    iFailed = 0
+    lFailures: list[tuple[str, str]] = []
 
-    print(f"\n[data.json 분석 시작] path={target_path}")
+    print(f"\n[data.json 분석 시작] path={pTargetPath}")
 
-    for pattern_key, pattern_case in pattern_cases:
-        total += 1
+    for sPatternKey, dPatternCase in lPatternCases:
+        iTotal += 1
         try:
-            size = extract_size_from_pattern_key(pattern_key)
-            pattern_input = pattern_case["input"]
-            expected_raw = pattern_case["expected"]
-            if not isinstance(expected_raw, str):
+            iSize = extract_size_from_pattern_key(sPatternKey)
+            lPatternInput = dPatternCase["input"]
+            sExpectedRaw = dPatternCase["expected"]
+            if not isinstance(sExpectedRaw, str):
                 raise ValueError("expected must be a string")
 
-            raw_filters = select_filters_for_size(filters_section, size=size)
-            normalized_filters: dict[str, list[list[float]]] = {}
-            for raw_filter_key, filter_matrix in raw_filters.items():
-                if not isinstance(raw_filter_key, str):
+            dRawFilters = select_filters_for_size(dFiltersSection, iSize=iSize)
+            dNormalizedFilters: dict[str, list[list[float]]] = {}
+            for sRawFilterKey, lFilterMatrix in dRawFilters.items():
+                if not isinstance(sRawFilterKey, str):
                     raise ValueError("filter key must be a string")
                 # 입력: raw_filter_key="cross"
                 # 반환: normalized_filter_key="Cross"
-                _, normalized_filter_key = normalize_expected_and_filter_key(expected_raw, raw_filter_key)
-                if normalized_filter_key in normalized_filters:
+                _, sNormalizedFilterKey = normalize_expected_and_filter_key(sExpectedRaw, sRawFilterKey)
+                if sNormalizedFilterKey in dNormalizedFilters:
                     raise ValueError(
-                        f"duplicate normalized filter label: {normalized_filter_key}",
+                        f"duplicate normalized filter label: {sNormalizedFilterKey}",
                     )
-                normalized_filters[normalized_filter_key] = filter_matrix
+                dNormalizedFilters[sNormalizedFilterKey] = lFilterMatrix
 
             # 입력: expected_raw="+"
             # 반환: normalized_expected="Cross"
-            normalized_expected = normalize_expected(expected_raw)
+            sNormalizedExpected = normalize_expected(sExpectedRaw)
             validate_pattern_and_filters(
-                pattern_input=pattern_input,
-                filters_by_label=normalized_filters,
-                expected_size=size,
+                lPatternInput=lPatternInput,
+                dFiltersByLabel=dNormalizedFilters,
+                iExpectedSize=iSize,
             )
 
-            if LABEL_CROSS not in normalized_filters or LABEL_X not in normalized_filters:
+            if LABEL_CROSS not in dNormalizedFilters or LABEL_X not in dNormalizedFilters:
                 raise ValueError("both Cross and X filters are required for each size")
 
-            t0 = time.perf_counter()
-            score_cross = compute_mac(pattern_input, normalized_filters[LABEL_CROSS])
-            score_x = compute_mac(pattern_input, normalized_filters[LABEL_X])
-            t1 = time.perf_counter()
-            elapsed_ms = (t1 - t0) * 1000.0
+            fStart = time.perf_counter()
+            fScoreCross = compute_mac(lPatternInput, dNormalizedFilters[LABEL_CROSS])
+            fScoreX = compute_mac(lPatternInput, dNormalizedFilters[LABEL_X])
+            fEnd = time.perf_counter()
+            fElapsedMs = (fEnd - fStart) * 1000.0
 
-            verdict = judge_cross_vs_x(score_cross, score_x, epsilon=DEFAULT_EPSILON)
+            sVerdict = judge_cross_vs_x(fScoreCross, fScoreX, fEpsilon=DEFAULT_EPSILON)
             # 입력: verdict="Cross", normalized_expected="Cross"
             # 반환: pass_fail="PASS"
-            pass_fail = "PASS" if verdict == normalized_expected else "FAIL"
-            if pass_fail == "PASS":
-                passed += 1
+            sPassFail = "PASS" if sVerdict == sNormalizedExpected else "FAIL"
+            if sPassFail == "PASS":
+                iPassed += 1
             else:
-                failed += 1
-                failures.append(
-                    (pattern_key, f"expected={normalized_expected}, verdict={verdict}"),
+                iFailed += 1
+                lFailures.append(
+                    (sPatternKey, f"expected={sNormalizedExpected}, verdict={sVerdict}"),
                 )
 
             print(
-                f"- {pattern_key}: Cross={score_cross}, X={score_x}, verdict={verdict}, expected={normalized_expected} -> {pass_fail} ({elapsed_ms:.6f} ms)",
+                f"- {sPatternKey}: Cross={fScoreCross}, X={fScoreX}, verdict={sVerdict}, expected={sNormalizedExpected} -> {sPassFail} ({fElapsedMs:.6f} ms)",
             )
-        except Exception as e:  # noqa: BLE001
-            failed += 1
-            failures.append((pattern_key, str(e)))
-            print(f"- {pattern_key}: FAIL ({e})")
+        except Exception as exc:  # noqa: BLE001
+            iFailed += 1
+            lFailures.append((sPatternKey, str(exc)))
+            print(f"- {sPatternKey}: FAIL ({exc})")
 
     print()
     print(
         summarize_results(
-            total=total,
-            passed=passed,
-            failed=failed,
-            failures_detail=failures,
+            iTotal=iTotal,
+            iPassed=iPassed,
+            iFailed=iFailed,
+            lFailuresDetail=lFailures,
         ),
     )
 
-    benchmark_cases: list[tuple[int, list[list[float]], list[list[float]], list[list[float]]]] = []
-    benchmark_cases.append((3, build_cross_pattern(3), build_cross_pattern(3), build_x_pattern(3)))
-    for size in (5, 13, 25):
+    lBenchmarkCases: list[tuple[int, list[list[float]], list[list[float]], list[list[float]]]] = []
+    lBenchmarkCases.append((3, build_cross_pattern(3), build_cross_pattern(3), build_x_pattern(3)))
+    for iSize in (5, 13, 25):
         try:
-            size_filters = select_filters_for_size(filters_section, size=size)
-            benchmark_cases.append(
+            dSizeFilters = select_filters_for_size(dFiltersSection, iSize=iSize)
+            lBenchmarkCases.append(
                 (
-                    size,
-                    build_cross_pattern(size),
-                    size_filters["cross"],
-                    size_filters["x"],
+                    iSize,
+                    build_cross_pattern(iSize),
+                    dSizeFilters["cross"],
+                    dSizeFilters["x"],
                 ),
             )
-        except Exception as e:  # noqa: BLE001
-            print(f"[성능 분석 제외] size_{size}: {e}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[성능 분석 제외] size_{iSize}: {exc}")
 
-    if benchmark_cases:
-        benchmark_rows = build_benchmark_rows(benchmark_cases, repeats=10)
+    if lBenchmarkCases:
+        lBenchmarkRows = build_benchmark_rows(lBenchmarkCases, iRepeats=10)
         print("\n--- 성능 분석 (3×3, 5×5, 13×13, 25×25) ---")
-        print(format_benchmark_table(benchmark_rows))
+        print(format_benchmark_table(lBenchmarkRows))
 
 
 def main() -> None:

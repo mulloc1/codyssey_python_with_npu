@@ -13,15 +13,15 @@ from src.npu_io.label_normalization import (
 
 class TestNormalizeExpectedAndFilterKey(unittest.TestCase):
     def test_normalizes_expected_and_filter_key_for_json_case(self) -> None:
-        normalized_expected, normalized_filter = normalize_expected_and_filter_key("+", "cross")
-        self.assertEqual(normalized_expected, LABEL_CROSS)
-        self.assertEqual(normalized_filter, LABEL_CROSS)
+        sNormalizedExpected, sNormalizedFilter = normalize_expected_and_filter_key("+", "cross")
+        self.assertEqual(sNormalizedExpected, LABEL_CROSS)
+        self.assertEqual(sNormalizedFilter, LABEL_CROSS)
 
 
 class TestNormalizeFilterScoreKeys(unittest.TestCase):
     def test_normalizes_score_map_keys_to_standard_labels(self) -> None:
-        normalized = normalize_filter_score_keys({"cross": 5.0, "x": 1.0})
-        self.assertEqual(normalized, {LABEL_CROSS: 5.0, LABEL_X: 1.0})
+        dNormalized = normalize_filter_score_keys({"cross": 5.0, "x": 1.0})
+        self.assertEqual(dNormalized, {LABEL_CROSS: 5.0, LABEL_X: 1.0})
 
     def test_raises_when_normalized_keys_collide(self) -> None:
         with self.assertRaises(ValueError):

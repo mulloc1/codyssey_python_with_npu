@@ -7,7 +7,7 @@ from typing import Any
 from src.npu.grid import validate_matrix
 
 
-def compute_mac(pattern: Any, filter_: Any) -> float:
+def compute_mac(lPattern: Any, lFilter: Any) -> float:
     """
     pattern과 filter_의 위치별 곱을 누적한 MAC 점수를 반환한다.
 
@@ -15,14 +15,14 @@ def compute_mac(pattern: Any, filter_: Any) -> float:
         ValueError: pattern/filter_ 형상이 유효하지 않거나 크기가 다를 때
         TypeError: validate_matrix의 타입 제약을 위반할 때
     """
-    pattern_size = validate_matrix(pattern)
-    filter_size = validate_matrix(filter_)
+    iPatternSize = validate_matrix(lPattern)
+    iFilterSize = validate_matrix(lFilter)
 
-    if pattern_size != filter_size:
+    if iPatternSize != iFilterSize:
         raise ValueError("pattern and filter must have the same shape")
 
-    acc = 0.0
-    for i in range(pattern_size):
-        for j in range(pattern_size):
-            acc += pattern[i][j] * filter_[i][j]
-    return float(acc)
+    fAcc = 0.0
+    for iRow in range(iPatternSize):
+        for iCol in range(iPatternSize):
+            fAcc += lPattern[iRow][iCol] * lFilter[iRow][iCol]
+    return float(fAcc)

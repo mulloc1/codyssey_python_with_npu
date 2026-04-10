@@ -32,16 +32,16 @@ class TestParseRow(unittest.TestCase):
 class TestReadSquareMatrixLines(unittest.TestCase):
     # 3줄이면 정사각 행렬로 파싱되어야 한다.
     def test_reads_three_lines(self) -> None:
-        lines = ["0 1 0", "1 1 1", "0 1 0"]
-        m = read_square_matrix_lines(lines, size=3)
-        self.assertEqual(len(m), 3)
-        self.assertEqual(m[0], [0.0, 1.0, 0.0])
+        lLines = ["0 1 0", "1 1 1", "0 1 0"]
+        lMatrix = read_square_matrix_lines(lLines, iSize=3)
+        self.assertEqual(len(lMatrix), 3)
+        self.assertEqual(lMatrix[0], [0.0, 1.0, 0.0])
 
     # 줄 수가 size와 다르면 예외여야 한다.
     def test_rejects_wrong_line_count(self) -> None:
-        with self.assertRaises(ValueError) as ctx:
-            read_square_matrix_lines(["0 1 0", "1 1 1"], size=3)
-        self.assertIn("3줄이 필요", str(ctx.exception))
+        with self.assertRaises(ValueError) as oCtx:
+            read_square_matrix_lines(["0 1 0", "1 1 1"], iSize=3)
+        self.assertIn("3줄이 필요", str(oCtx.exception))
 
 
 if __name__ == "__main__":

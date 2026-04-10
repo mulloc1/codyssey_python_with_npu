@@ -19,17 +19,17 @@ _FILTER_KEY_LABEL_MAP: dict[str, str] = {
 }
 
 
-def normalize_expected(value: str) -> str:
+def normalize_expected(sValue: str) -> str:
     """expected 라벨 입력을 표준 라벨(Cross/X)로 변환한다."""
     try:
-        return _EXPECTED_LABEL_MAP[value]
+        return _EXPECTED_LABEL_MAP[sValue]
     except KeyError as exc:
-        raise ValueError(f"unsupported expected label: {value}") from exc
+        raise ValueError(f"unsupported expected label: {sValue}") from exc
 
 
-def normalize_filter_key(value: str) -> str:
+def normalize_filter_key(sValue: str) -> str:
     """필터 키 입력을 표준 라벨(Cross/X)로 변환한다."""
     try:
-        return _FILTER_KEY_LABEL_MAP[value]
+        return _FILTER_KEY_LABEL_MAP[sValue]
     except KeyError as exc:
-        raise ValueError(f"unsupported filter key label: {value}") from exc
+        raise ValueError(f"unsupported filter key label: {sValue}") from exc

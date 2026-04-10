@@ -11,32 +11,32 @@ from src.npu_io.json_loader import iter_pattern_cases, load_json
 
 class TestLoadJson(unittest.TestCase):
     def test_loads_valid_json_object(self) -> None:
-        payload = {"filters": {}, "patterns": {}}
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as tf:
-            json.dump(payload, tf)
-            path = tf.name
-        loaded = load_json(path)
-        self.assertEqual(loaded, payload)
+        dPayload = {"filters": {}, "patterns": {}}
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as fTempFile:
+            json.dump(dPayload, fTempFile)
+            sPath = fTempFile.name
+        dLoaded = load_json(sPath)
+        self.assertEqual(dLoaded, dPayload)
 
     def test_raises_when_json_root_is_not_object(self) -> None:
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as tf:
-            json.dump([1, 2, 3], tf)
-            path = tf.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as fTempFile:
+            json.dump([1, 2, 3], fTempFile)
+            sPath = fTempFile.name
         with self.assertRaises(ValueError):
-            load_json(path)
+            load_json(sPath)
 
 
 class TestIterPatternCases(unittest.TestCase):
     def test_returns_key_case_list(self) -> None:
-        data = {
+        dData = {
             "patterns": {
                 "size_5_001": {"input": [[0]], "expected": "+"},
                 "size_5_002": {"input": [[1]], "expected": "x"},
             },
         }
-        cases = iter_pattern_cases(data)
-        self.assertEqual(len(cases), 2)
-        self.assertEqual(cases[0][0], "size_5_001")
+        lCases = iter_pattern_cases(dData)
+        self.assertEqual(len(lCases), 2)
+        self.assertEqual(lCases[0][0], "size_5_001")
 
     def test_raises_when_patterns_section_missing(self) -> None:
         with self.assertRaises(ValueError):

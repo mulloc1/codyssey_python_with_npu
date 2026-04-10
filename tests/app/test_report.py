@@ -9,34 +9,34 @@ from src.app.report import summarize_results
 
 class TestSummarizeResults(unittest.TestCase):
     def test_formats_counts(self) -> None:
-        text = summarize_results(
-            total=8,
-            passed=7,
-            failed=1,
-            failures_detail=[],
+        sText = summarize_results(
+            iTotal=8,
+            iPassed=7,
+            iFailed=1,
+            lFailuresDetail=[],
         )
-        self.assertIn("전체 테스트 수: 8", text)
-        self.assertIn("통과 수: 7", text)
-        self.assertIn("실패 수: 1", text)
+        self.assertIn("전체 테스트 수: 8", sText)
+        self.assertIn("통과 수: 7", sText)
+        self.assertIn("실패 수: 1", sText)
 
     def test_formats_failure_details(self) -> None:
-        text = summarize_results(
-            total=3,
-            passed=2,
-            failed=1,
-            failures_detail=[("size_5_099", "expected 5x5 matrix, got 4x4")],
+        sText = summarize_results(
+            iTotal=3,
+            iPassed=2,
+            iFailed=1,
+            lFailuresDetail=[("size_5_099", "expected 5x5 matrix, got 4x4")],
         )
-        self.assertIn("실패 케이스:", text)
-        self.assertIn("size_5_099: expected 5x5 matrix, got 4x4", text)
+        self.assertIn("실패 케이스:", sText)
+        self.assertIn("size_5_099: expected 5x5 matrix, got 4x4", sText)
 
     def test_omits_failure_section_when_no_failures(self) -> None:
-        text = summarize_results(
-            total=2,
-            passed=2,
-            failed=0,
-            failures_detail=[],
+        sText = summarize_results(
+            iTotal=2,
+            iPassed=2,
+            iFailed=0,
+            lFailuresDetail=[],
         )
-        self.assertNotIn("실패 케이스:", text)
+        self.assertNotIn("실패 케이스:", sText)
 
 
 if __name__ == "__main__":

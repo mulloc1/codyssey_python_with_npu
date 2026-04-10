@@ -8,7 +8,7 @@ ROW_FORMAT_ERROR_3 = (
 )
 
 
-def parse_row(line: str, expected_count: int = 3) -> list[float]:
+def parse_row(sLine: str, iExpectedCount: int = 3) -> list[float]:
     """
     공백으로 구분된 숫자 한 줄을 파싱한다.
 
@@ -21,23 +21,23 @@ def parse_row(line: str, expected_count: int = 3) -> list[float]:
     Raises:
         ValueError: 토큰 개수 불일치 또는 숫자 파싱 실패 시
     """
-    parts = line.strip().split()
-    if len(parts) != expected_count:
-        msg = ROW_FORMAT_ERROR_3 if expected_count == 3 else _generic_row_error(expected_count)
-        raise ValueError(msg)
+    lParts = sLine.strip().split()
+    if len(lParts) != iExpectedCount:
+        sMsg = ROW_FORMAT_ERROR_3 if iExpectedCount == 3 else _generic_row_error(iExpectedCount)
+        raise ValueError(sMsg)
 
     try:
-        return [float(p) for p in parts]
-    except ValueError as e:
-        msg = ROW_FORMAT_ERROR_3 if expected_count == 3 else _generic_row_error(expected_count)
-        raise ValueError(msg) from e
+        return [float(sPart) for sPart in lParts]
+    except ValueError as exc:
+        sMsg = ROW_FORMAT_ERROR_3 if iExpectedCount == 3 else _generic_row_error(iExpectedCount)
+        raise ValueError(sMsg) from exc
 
 
-def _generic_row_error(expected_count: int) -> str:
-    return f"입력 형식 오류: 각 줄에 {expected_count}개의 숫자를 공백으로 구분해 입력하세요."
+def _generic_row_error(iExpectedCount: int) -> str:
+    return f"입력 형식 오류: 각 줄에 {iExpectedCount}개의 숫자를 공백으로 구분해 입력하세요."
 
 
-def read_square_matrix_lines(lines: list[str], size: int = 3) -> list[list[float]]:
+def read_square_matrix_lines(lLines: list[str], iSize: int = 3) -> list[list[float]]:
     """
     정확히 size줄의 문자열을 정사각 행렬로 파싱한다.
 
@@ -48,8 +48,8 @@ def read_square_matrix_lines(lines: list[str], size: int = 3) -> list[list[float
     Raises:
         ValueError: 줄 개수 불일치 또는 행 파싱 실패
     """
-    if len(lines) != size:
+    if len(lLines) != iSize:
         raise ValueError(
-            f"입력 형식 오류: {size}줄이 필요합니다. (현재 {len(lines)}줄)"
+            f"입력 형식 오류: {iSize}줄이 필요합니다. (현재 {len(lLines)}줄)"
         )
-    return [parse_row(line, expected_count=size) for line in lines]
+    return [parse_row(sLine, iExpectedCount=iSize) for sLine in lLines]

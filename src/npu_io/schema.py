@@ -10,7 +10,7 @@ from src.npu.grid import validate_matrix
 _PATTERN_KEY_RE = re.compile(r"^size_(\d+)_(\d+)$")
 
 
-def extract_size_from_pattern_key(pattern_key: str) -> int:
+def extract_size_from_pattern_key(sPatternKey: str) -> int:
     """
     pattern key(`size_{N}_{idx}`)에서 N을 추출한다.
 
@@ -20,14 +20,14 @@ def extract_size_from_pattern_key(pattern_key: str) -> int:
         입력: "size_5_001"
         반환: 5
     """
-    match = _PATTERN_KEY_RE.match(pattern_key)
-    if match is None:
-        raise ValueError(f"invalid pattern key format: {pattern_key}")
-    return int(match.group(1))
+    oMatch = _PATTERN_KEY_RE.match(sPatternKey)
+    if oMatch is None:
+        raise ValueError(f"invalid pattern key format: {sPatternKey}")
+    return int(oMatch.group(1))
 
 
-def select_filters_for_size(filters_section: dict[str, Any], size: int) -> dict[str, Any]:
-    f"""
+def select_filters_for_size(dFiltersSection: dict[str, Any], iSize: int) -> dict[str, Any]:
+    """
     filters 섹션에서 size에 대응하는 필터 맵을 반환한다.
 
     예시:
@@ -37,24 +37,24 @@ def select_filters_for_size(filters_section: dict[str, Any], size: int) -> dict[
         }, size = 5
         반환: {...} => n * n 의 filter matrix
     """
-    size_key = f"size_{size}"
-    filters_for_size = filters_section.get(size_key)
-    if not isinstance(filters_for_size, dict):
-        raise ValueError(f"missing or invalid filters for '{size_key}'")
-    return filters_for_size
+    sSizeKey = f"size_{iSize}"
+    dFiltersForSize = dFiltersSection.get(sSizeKey)
+    if not isinstance(dFiltersForSize, dict):
+        raise ValueError(f"missing or invalid filters for '{sSizeKey}'")
+    return dFiltersForSize
 
 
 def validate_pattern_and_filters(
-    pattern_input: Any,
-    filters_by_label: dict[str, Any],
-    expected_size: int,
+    lPatternInput: Any,
+    dFiltersByLabel: dict[str, Any],
+    iExpectedSize: int,
 ) -> None:
     """패턴과 필터들의 N×N 형상을 검증한다."""
-    validate_matrix(pattern_input, expected_size=expected_size)
-    for filter_label, filter_matrix in filters_by_label.items():
+    validate_matrix(lPatternInput, iExpectedSize=iExpectedSize)
+    for sFilterLabel, lFilterMatrix in dFiltersByLabel.items():
         try:
-            validate_matrix(filter_matrix, expected_size=expected_size)
+            validate_matrix(lFilterMatrix, iExpectedSize=iExpectedSize)
         except (ValueError, TypeError) as exc:
             raise ValueError(
-                f"invalid filter matrix for '{filter_label}': {exc}",
+                f"invalid filter matrix for '{sFilterLabel}': {exc}",
             ) from exc
