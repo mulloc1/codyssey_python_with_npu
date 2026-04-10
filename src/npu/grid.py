@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Sequence
 
 
-def validate_matrix(lMatrix: Any, iExpectedSize: int | None = None) -> int:
+def validate_matrix(lMatrix: list[list[int]], iExpectedSize: int | None = None) -> int:
     """
     유효한 N×N 정사각형인지 검증하고 N을 반환한다.
 
