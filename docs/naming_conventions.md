@@ -30,6 +30,8 @@
 | `int` | `i` | `iSize`, `iTotal` |
 | `float` | `f` | `fScoreCross`, `fElapsedMs` |
 | `str` | `s` | `sExpectedRaw`, `sSizeKey` |
+| `pathlib.Path` | `p` | `pFilePath`, `pTargetPath` |
+| `Callable` (function) | `fn` | `fnReader`, `fnInput` |
 | `bool` | `b` | `bIsValid`, `bHasFailure` |
 | `list` | `l` | `lPatternCases`, `lFailureDetails` |
 | `dict` | `d` | `dData`, `dNormalizedFilters` |
@@ -39,6 +41,10 @@
 - 복합 타입은 바깥 타입 기준으로 시작한다.
   - `list[dict[str, float]]` -> `lScoreRows`
   - `dict[str, list[list[float]]]` -> `dFiltersByLabel`
+- 파일 경로를 `Path` 객체로 다룰 때는 `p` 접두사를 사용한다.
+  - 예: `pFilePath = Path(sPath)`
+- 함수(콜러블) 참조를 담는 변수는 `fn` 접두사를 사용한다.
+  - 예: `fnReader = input_fn or input`
 
 ---
 
