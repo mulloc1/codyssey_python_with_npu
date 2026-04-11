@@ -90,7 +90,7 @@ def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
             print("\n[저장 확인] 필터 A, B가 올바르게 입력되었습니다. 패턴을 이어서 입력합니다.")
 
             lPattern = _read_3x3_matrix_lines("패턴 (3×3)", fnRead)
-        except KeyboardInterrupt:
+        except (EOFError, KeyboardInterrupt):
             print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
             return
 
