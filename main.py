@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.app.console_flow import main
+from src.app.console_flow import run
 
 if __name__ == "__main__":
-    main()
+    run()

@@ -22,8 +22,8 @@ python_with_npu/
 
 | 경로 | 역할 |
 |------|------|
-| `main.py` | `console_flow.main()`을 호출하는 진입점 |
-| `src/app/console_flow.py` | 메인 메뉴·모드 라우팅(`run_main_menu`, `main`) |
+| `main.py` | `console_flow.run()`을 호출하는 진입점 |
+| `src/app/console_flow.py` | 메인 메뉴·모드 라우팅(`run`) |
 | `src/app/user_input_3x3.py` | 3×3 수동 입력 모드(MAC·판정·소형 성능 표) |
 | `src/app/data_json_mode.py` | `data.json` 분석 모드(케이스별 출력·요약·성능 표) |
 | `src/app/report.py` | JSON 모드 종료 시 통과·실패 요약 문자열 생성 |
