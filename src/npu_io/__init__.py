@@ -5,7 +5,7 @@ from src.npu_io.label_normalization import (
     normalize_filter_score_keys,
 )
 from src.npu_io.json_loader import iter_pattern_cases, load_json
-from src.npu_io.parse import ROW_FORMAT_ERROR_3, parse_row, read_square_matrix_lines
+from src.npu_io.parse import ROW_FORMAT_ERROR_3, parse_row
 from src.npu_io.schema import (
     extract_size_from_pattern_key,
     select_filters_for_size,
@@ -20,7 +20,6 @@ __all__ = [
     "normalize_expected_and_filter_key",
     "normalize_filter_score_keys",
     "parse_row",
-    "read_square_matrix_lines",
     "select_filters_for_size",
     "validate_pattern_and_filters",
 ]

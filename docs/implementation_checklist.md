@@ -169,7 +169,7 @@ feat: epsilon 기반 판정 로직 구현
 
 | 구분 | 권장 경로 |
 |------|-----------|
-| 구현 | 예: `src/npu_io/parse.py` — `parse_row(line, expected_count)`, `read_square_matrix_lines(lines)` 등 **문자열/리스트만** 다루는 함수 |
+| 구현 | 예: `src/npu_io/parse.py` — `parse_row(line, expected_count)` 등 **문자열 한 줄**만 다루는 함수 |
 | 구현 | 예: `src/app/console_flow.py` — `input()` 루프는 얇게, 검증은 `parse`로 위임 |
 | 테스트 | `tests/npu_io_tests/test_parse.py` — 잘못된 줄, 공백 여러 개, 음수/실수 등 |
 | 테스트 | 콘솔 통합은 최소화하고, **순수 파서만** 유닛 테스트 |

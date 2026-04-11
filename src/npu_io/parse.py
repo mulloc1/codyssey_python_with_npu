@@ -35,21 +35,3 @@ def parse_row(sLine: str, iExpectedCount: int = 3) -> list[float]:
 
 def _generic_row_error(iExpectedCount: int) -> str:
     return f"입력 형식 오류: 각 줄에 {iExpectedCount}개의 숫자를 공백으로 구분해 입력하세요."
-
-
-def read_square_matrix_lines(lLines: list[str], iSize: int = 3) -> list[list[float]]:
-    """
-    정확히 size줄의 문자열을 정사각 행렬로 파싱한다.
-
-    예시:
-        입력: ["0 1 0", "1 1 1", "0 1 0"]
-        반환: [[0.0, 1.0, 0.0], [1.0, 1.0, 1.0], [0.0, 1.0, 0.0]]
-
-    Raises:
-        ValueError: 줄 개수 불일치 또는 행 파싱 실패
-    """
-    if len(lLines) != iSize:
-        raise ValueError(
-            f"입력 형식 오류: {iSize}줄이 필요합니다. (현재 {len(lLines)}줄)"
-        )
-    return [parse_row(sLine, iExpectedCount=iSize) for sLine in lLines]

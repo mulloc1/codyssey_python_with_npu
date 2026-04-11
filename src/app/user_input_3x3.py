@@ -8,23 +8,22 @@ from src.npu.benchmark import build_benchmark_rows, format_benchmark_table
 from src.npu.constants import DEFAULT_EPSILON, LABEL_UNDECIDED
 from src.npu.judgement import judge_ab
 from src.npu.mac import compute_mac, validate_mac_inputs
-from src.npu_io.parse import parse_row, read_square_matrix_lines
+from src.npu_io.parse import parse_row
 
 
 def _read_3x3_matrix_lines(sLabel: str) -> list[list[float]]:
     print(f"\n{sLabel}")
     print("각 줄에 3개의 숫자를 공백으로 구분해 입력하세요.")
-    lLines: list[str] = []
+    lMatrix: list[list[float]] = []
     for i in range(3):
         while True:
             sLine = input(f"  줄 {i + 1}/3: ")
             try:
-                parse_row(sLine, iExpectedCount=3)
-                lLines.append(sLine)
+                lMatrix.append(parse_row(sLine, iExpectedCount=3))
                 break
             except ValueError as exc:
                 print(exc)
-    return read_square_matrix_lines(lLines, iSize=3)
+    return lMatrix
 
 
 def run_user_input_mode_3x3() -> None:

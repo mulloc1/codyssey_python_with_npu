@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from src.npu_io.parse import ROW_FORMAT_ERROR_3, parse_row, read_square_matrix_lines
+from src.npu_io.parse import ROW_FORMAT_ERROR_3, parse_row
 
 
 class TestParseRow(unittest.TestCase):
@@ -29,19 +29,14 @@ class TestParseRow(unittest.TestCase):
         self.assertEqual(str(ctx.exception), ROW_FORMAT_ERROR_3)
 
 
-class TestReadSquareMatrixLines(unittest.TestCase):
-    # 3줄이면 정사각 행렬로 파싱되어야 한다.
-    def test_reads_three_lines(self) -> None:
+class TestParseRowMatrixIdiom(unittest.TestCase):
+    """다줄 행렬은 호출부에서 줄 수를 맞춘 뒤 행마다 parse_row를 쓴다."""
+
+    def test_three_lines_via_parse_row(self) -> None:
         lLines = ["0 1 0", "1 1 1", "0 1 0"]
-        lMatrix = read_square_matrix_lines(lLines, iSize=3)
+        lMatrix = [parse_row(sLine, iExpectedCount=3) for sLine in lLines]
         self.assertEqual(len(lMatrix), 3)
         self.assertEqual(lMatrix[0], [0.0, 1.0, 0.0])
-
-    # 줄 수가 size와 다르면 예외여야 한다.
-    def test_rejects_wrong_line_count(self) -> None:
-        with self.assertRaises(ValueError) as oCtx:
-            read_square_matrix_lines(["0 1 0", "1 1 1"], iSize=3)
-        self.assertIn("3줄이 필요", str(oCtx.exception))
 
 
 if __name__ == "__main__":
