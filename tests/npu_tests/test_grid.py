@@ -9,7 +9,7 @@ from __future__ import annotations
 import unittest
 
 from src.npu.constants import DEFAULT_EPSILON
-from src.npu.grid import same_shape, validate_matrix
+from src.npu.grid import validate_matrix
 
 
 def _zeros(iSize: int) -> list[list[int]]:
@@ -43,25 +43,6 @@ class TestValidateMatrix(unittest.TestCase):
     def test_rejects_ragged_rows(self) -> None:
         with self.assertRaises(ValueError):
             validate_matrix([[0, 0], [0, 0, 0]])
-
-
-class TestSameShape(unittest.TestCase):
-    # 동일한 크기의 두 정사각형은 same_shape가 True여야 한다.
-    def test_true_when_both_same_n(self) -> None:
-        lMatrixA = _zeros(3)
-        lMatrixB = _zeros(3)
-        self.assertTrue(same_shape(lMatrixA, lMatrixB))
-
-    # 크기가 다르면 same_shape가 False여야 한다.
-    def test_false_when_different_n(self) -> None:
-        lMatrixA = _zeros(3)
-        lMatrixB = _zeros(5)
-        self.assertFalse(same_shape(lMatrixA, lMatrixB))
-
-    # 둘 중 하나라도 유효하지 않은 행렬이면 False여야 한다.
-    def test_false_when_either_invalid(self) -> None:
-        self.assertFalse(same_shape([], _zeros(3)))
-        self.assertFalse(same_shape(_zeros(3), []))
 
 
 class TestValidateMatrixWithExpectedSize(unittest.TestCase):

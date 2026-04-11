@@ -4,44 +4,37 @@ from __future__ import annotations
 
 from src.npu.constants import LABEL_CROSS, LABEL_X
 
-_EXPECTED_LABEL_MAP: dict[str, str] = {
+_LABEL_MAP: dict[str, str] = {
+    "cross": LABEL_CROSS,
+    "x": LABEL_X,
     "+": LABEL_CROSS,
-    "x": LABEL_X,
-    LABEL_CROSS: LABEL_CROSS,
-    LABEL_X: LABEL_X,
-}
-
-# primary에 없는 expected 별칭(소문자만). "x"/"X"는 primary, "+"는 보조에 넣지 않음.
-_EXPECTED_LABEL_LOWER_ALIASES: dict[str, str] = {
-    "cross": LABEL_CROSS,
-}
-
-_FILTER_KEY_LABEL_MAP: dict[str, str] = {
-    "cross": LABEL_CROSS,
-    "x": LABEL_X,
     LABEL_CROSS: LABEL_CROSS,
     LABEL_X: LABEL_X,
 }
 
 
-def normalize_expected(sValue: str) -> str:
-    """expected 라벨 입력을 표준 라벨(Cross/X)로 변환한다."""
+def normalize_label(sValue: str) -> str:
+    """라벨 문자열을 표준 라벨(Cross/X)로 변환한다."""
     s = sValue.strip()
-    if s in _EXPECTED_LABEL_MAP:
-        return _EXPECTED_LABEL_MAP[s]
+    if s in _LABEL_MAP:
+        return _LABEL_MAP[s]
     sl = s.lower()
-    if sl in _EXPECTED_LABEL_LOWER_ALIASES:
-        return _EXPECTED_LABEL_LOWER_ALIASES[sl]
-    raise ValueError(f"unsupported expected label: {sValue}")
+    if sl in _LABEL_MAP:
+        return _LABEL_MAP[sl]
+    raise ValueError(f"unsupported label: {sValue}")
 
 
-def normalize_filter_key(sValue: str) -> str:
-    """필터 키 입력을 표준 라벨(Cross/X)로 변환한다."""
-    s = sValue.strip()
-    if s in _FILTER_KEY_LABEL_MAP:
-        return _FILTER_KEY_LABEL_MAP[s]
-    sl = s.lower()
-    try:
-        return _FILTER_KEY_LABEL_MAP[sl]
-    except KeyError as exc:
-        raise ValueError(f"unsupported filter key label: {sValue}") from exc
+def normalize_filter_score_keys(dScoresByFilterKey: dict[str, float]) -> dict[str, float]:
+    """
+    필터 키를 표준 라벨로 변환한 점수 맵을 반환한다.
+
+    입력: {"cross": 1.2, "x": 0.9}
+    반환: {"Cross": 1.2, "X": 0.9}
+    """
+    dNormalized: dict[str, float] = {}
+    for sKey, fScore in dScoresByFilterKey.items():
+        sNormalizedKey = normalize_label(sKey)
+        if sNormalizedKey in dNormalized:
+            raise ValueError(f"duplicate normalized filter label: {sNormalizedKey}")
+        dNormalized[sNormalizedKey] = fScore
+    return dNormalized

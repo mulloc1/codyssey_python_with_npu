@@ -28,9 +28,3 @@ def compute_mac(lPattern: Any, lFilter: Any, iSize: int) -> float:
         for iCol in range(iSize):
             fAcc += lPattern[iRow][iCol] * lFilter[iRow][iCol]
     return float(fAcc)
-
-
-def compute_mac_checked(lPattern: Any, lFilter: Any) -> float:
-    """검증 후 MAC를 계산하는 하위호환용 래퍼 함수."""
-    iSize = validate_mac_inputs(lPattern, lFilter)
-    return compute_mac(lPattern, lFilter, iSize)

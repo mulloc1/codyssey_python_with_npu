@@ -37,11 +37,7 @@ def iter_pattern_cases(dData: dict[str, Any]) -> list[tuple[str, dict[str, Any]]
     if not isinstance(dPatterns, dict):
         raise ValueError("missing or invalid 'patterns' section")
 
-    lCases: list[tuple[str, dict[str, Any]]] = []
     for sKey, dValue in dPatterns.items():
-        if not isinstance(sKey, str):
-            raise ValueError("pattern key must be a string")
         if not isinstance(dValue, dict):
             raise ValueError(f"pattern '{sKey}' must be an object")
-        lCases.append((sKey, dValue))
-    return lCases
+    return list(dPatterns.items())

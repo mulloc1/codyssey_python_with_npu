@@ -28,7 +28,7 @@ python_with_npu/
 | `src/app/data_json_mode.py` | `data.json` 분석 모드(케이스별 출력·요약·성능 표) |
 | `src/app/report.py` | JSON 모드 종료 시 통과·실패 요약 문자열 생성 |
 | `src/app/constants.py` | 메뉴 선택값 등 앱 상수 |
-| `src/npu/mac.py` | MAC 누적 연산: `validate_mac_inputs`, 순수 `compute_mac(pattern, filter, size)`, 검증 포함 `compute_mac_checked` |
+| `src/npu/mac.py` | MAC 누적 연산: `validate_mac_inputs`, 순수 `compute_mac(pattern, filter, size)` |
 | `src/npu/grid.py` | 2차원 리스트가 정사각형 `N×N`인지 검증 (`validate_matrix` 등) |
 | `src/npu/judgement.py` | MAC 점수 비교로 A/B 또는 Cross vs X 판정 (epsilon 반영) |
 | `src/npu/labels.py` | 기대 라벨·필터 키 문자열을 내부 `Cross` / `X` 등으로 정규화 |
@@ -38,7 +38,7 @@ python_with_npu/
 | `src/npu_io/json_loader.py` | `data.json` 로드, `patterns` 섹션 순회 |
 | `src/npu_io/schema.py` | 패턴 키에서 `N` 추출, 크기별 필터 선택, 패턴·필터 형상 일괄 검증 |
 | `src/npu_io/parse.py` | 콘솔 한 줄·행 단위 입력 파싱 |
-| `src/npu_io/label_normalization.py` | JSON 쪽 raw 필터 키·expected와의 정규화 조합 |
+| `src/npu_io/label_normalization.py` | 필터 키 집합을 표준 라벨로 변환·중복 검증 (`normalize_filter_score_keys`) |
 | `tests/` | 위 모듈별 단위 테스트 |
 | `docs/` | 구현 체크리스트, 네이밍, [함수 작성 가이드](docs/function_conventions.md) 등 |
 

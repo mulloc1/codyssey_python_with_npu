@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from typing import Any
 
 
 def validate_matrix(lMatrix: list[list[int]], iExpectedSize: int | None = None) -> int:
@@ -41,15 +41,3 @@ def validate_matrix(lMatrix: list[list[int]], iExpectedSize: int | None = None) 
             raise ValueError(f"expected {iExpectedSize}x{iExpectedSize} matrix, got {iSize}x{iSize}")
 
     return iSize
-
-
-def same_shape(lMatrixA: Sequence[Any], lMatrixB: Sequence[Any]) -> bool:
-    """두 그리드가 동일한 N×N 형상이면 True."""
-    try:
-        iSizeA = validate_matrix(lMatrixA)
-        iSizeB = validate_matrix(lMatrixB)
-    except ValueError:
-        return False
-    except TypeError:
-        return False
-    return iSizeA == iSizeB

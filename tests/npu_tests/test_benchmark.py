@@ -7,7 +7,6 @@ from unittest.mock import patch
 
 from src.npu.benchmark import (
     benchmark_mac_average,
-    benchmark_mac_once,
     benchmark_pair,
     format_benchmark_table,
 )
@@ -30,11 +29,6 @@ def _x_3() -> list[list[float]]:
 
 
 class TestBenchmarkCore(unittest.TestCase):
-    def test_benchmark_mac_once_uses_perf_counter_delta(self) -> None:
-        with patch("src.npu.benchmark.time.perf_counter", side_effect=[1.0, 1.002]):
-            fElapsedMs = benchmark_mac_once(_cross_3(), _cross_3())
-        self.assertAlmostEqual(fElapsedMs, 2.0, places=9)
-
     def test_benchmark_mac_average_returns_repeat_mean(self) -> None:
         # repeats=2, 각 반복에서 (1ms, 3ms) 구간
         with patch(

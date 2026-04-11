@@ -12,9 +12,9 @@ from src.npu.benchmark import (
     format_benchmark_table,
 )
 from src.npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_X
-from src.npu.judgement import judge_cross_vs_x
-from src.npu.labels import normalize_expected, normalize_filter_key
-from src.npu.mac import compute_mac, validate_mac_inputs
+from src.npu.judgement import judge
+from src.npu.labels import normalize_label
+from src.npu.mac import compute_mac
 from src.npu_io.json_loader import iter_pattern_cases, load_json
 from src.npu_io.schema import (
     extract_size_from_pattern_key,
@@ -67,18 +67,11 @@ def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
                 raise ValueError("expected must be a string")
 
             dRawFilters = select_filters_for_size(dFiltersSection, iSize=iSize)
-            dNormalizedFilters: dict[str, list[list[float]]] = {}
-            for sRawFilterKey, lFilterMatrix in dRawFilters.items():
-                if not isinstance(sRawFilterKey, str):
-                    raise ValueError("filter key must be a string")
-                sNormalizedFilterKey = normalize_filter_key(sRawFilterKey)
-                if sNormalizedFilterKey in dNormalizedFilters:
-                    raise ValueError(
-                        f"duplicate normalized filter label: {sNormalizedFilterKey}",
-                    )
-                dNormalizedFilters[sNormalizedFilterKey] = lFilterMatrix
+            dNormalizedFilters = {
+                normalize_label(k): v for k, v in dRawFilters.items()
+            }
 
-            sNormalizedExpected = normalize_expected(sExpectedRaw)
+            sNormalizedExpected = normalize_label(sExpectedRaw)
             validate_pattern_and_filters(
                 lPatternInput=lPatternInput,
                 dFiltersByLabel=dNormalizedFilters,
@@ -88,18 +81,13 @@ def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
             if LABEL_CROSS not in dNormalizedFilters or LABEL_X not in dNormalizedFilters:
                 raise ValueError("both Cross and X filters are required for each size")
 
-            iMacCross = validate_mac_inputs(lPatternInput, dNormalizedFilters[LABEL_CROSS])
-            iMacX = validate_mac_inputs(lPatternInput, dNormalizedFilters[LABEL_X])
-            if iMacCross != iMacX:
-                raise ValueError("MAC square size mismatch across filters after validation")
-            iMacSize = iMacCross
             fStart = time.perf_counter()
-            fScoreCross = compute_mac(lPatternInput, dNormalizedFilters[LABEL_CROSS], iMacSize)
-            fScoreX = compute_mac(lPatternInput, dNormalizedFilters[LABEL_X], iMacSize)
+            fScoreCross = compute_mac(lPatternInput, dNormalizedFilters[LABEL_CROSS], iSize)
+            fScoreX = compute_mac(lPatternInput, dNormalizedFilters[LABEL_X], iSize)
             fEnd = time.perf_counter()
             fElapsedMs = (fEnd - fStart) * 1000.0
 
-            sVerdict = judge_cross_vs_x(fScoreCross, fScoreX, fEpsilon=DEFAULT_EPSILON)
+            sVerdict = judge(fScoreCross, fScoreX, LABEL_CROSS, LABEL_X, fEpsilon=DEFAULT_EPSILON)
             sPassFail = "PASS" if sVerdict == sNormalizedExpected else "FAIL"
             if sPassFail == "PASS":
                 iPassed += 1

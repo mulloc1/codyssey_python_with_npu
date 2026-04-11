@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from src.app.constants import (
-    MENU_JSON_ANALYSIS,
-    MENU_USER_INPUT_3X3,
-)
 from src.app.data_json_mode import run_data_json_mode
 from src.app.user_input_3x3 import run_user_input_mode_3x3
+
+_MENU_USER_INPUT_3X3 = "1"
+_MENU_JSON_ANALYSIS = "2"
 
 
 def run() -> None:
@@ -21,12 +20,10 @@ def run() -> None:
         except (EOFError, KeyboardInterrupt):
             print("\n입력이 중단되어 종료합니다.")
             return
-        if sChoice == MENU_USER_INPUT_3X3:
+        if sChoice == _MENU_USER_INPUT_3X3:
             run_user_input_mode_3x3()
             continue
-        if sChoice == MENU_JSON_ANALYSIS:
+        if sChoice == _MENU_JSON_ANALYSIS:
             run_data_json_mode()
             continue
-        print(
-            f"\n{MENU_USER_INPUT_3X3}, {MENU_JSON_ANALYSIS} 중에서 입력해 주세요.",
-        )
+        print(f"\n{_MENU_USER_INPUT_3X3}, {_MENU_JSON_ANALYSIS} 중에서 입력해 주세요.")

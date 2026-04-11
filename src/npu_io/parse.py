@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
-# subject.md 4-2 예시 문구
 ROW_FORMAT_ERROR_3 = (
     "입력 형식 오류: 각 줄에 3개의 숫자를 공백으로 구분해 입력하세요."
 )
+
+
+def _row_error_message(iExpectedCount: int) -> str:
+    if iExpectedCount == 3:
+        return ROW_FORMAT_ERROR_3
+    return f"입력 형식 오류: 각 줄에 {iExpectedCount}개의 숫자를 공백으로 구분해 입력하세요."
 
 
 def parse_row(sLine: str, iExpectedCount: int = 3) -> list[float]:
@@ -23,15 +28,9 @@ def parse_row(sLine: str, iExpectedCount: int = 3) -> list[float]:
     """
     lParts = sLine.strip().split()
     if len(lParts) != iExpectedCount:
-        sMsg = ROW_FORMAT_ERROR_3 if iExpectedCount == 3 else _generic_row_error(iExpectedCount)
-        raise ValueError(sMsg)
+        raise ValueError(_row_error_message(iExpectedCount))
 
     try:
         return [float(sPart) for sPart in lParts]
     except ValueError as exc:
-        sMsg = ROW_FORMAT_ERROR_3 if iExpectedCount == 3 else _generic_row_error(iExpectedCount)
-        raise ValueError(sMsg) from exc
-
-
-def _generic_row_error(iExpectedCount: int) -> str:
-    return f"입력 형식 오류: 각 줄에 {iExpectedCount}개의 숫자를 공백으로 구분해 입력하세요."
+        raise ValueError(_row_error_message(iExpectedCount)) from exc

@@ -8,15 +8,6 @@ from typing import Any
 from src.npu.mac import compute_mac, validate_mac_inputs
 
 
-def benchmark_mac_once(lPattern: Any, lFilter: Any) -> float:
-    """MAC 1회 실행 시간을 ms 단위로 반환한다."""
-    iSize = validate_mac_inputs(lPattern, lFilter)
-    fStart = time.perf_counter()
-    compute_mac(lPattern, lFilter, iSize)
-    fEnd = time.perf_counter()
-    return (fEnd - fStart) * 1000.0
-
-
 def benchmark_mac_average(lPattern: Any, lFilter: Any, iRepeats: int = 10) -> float:
     """MAC 반복 실행 평균 시간을 ms 단위로 반환한다."""
     if iRepeats <= 0:
@@ -65,56 +56,38 @@ def build_benchmark_rows(
     iRepeats: int = 10,
 ) -> list[dict[str, float | int]]:
     """(size, pattern, filter_a, filter_b) 목록을 성능 행 목록으로 변환한다."""
-    lRows: list[dict[str, float | int]] = []
-    for iSize, lPattern, lFilterA, lFilterB in lCases:
-        dRow = benchmark_pair(lPattern, lFilterA, lFilterB, iRepeats=iRepeats)
-        dRow["size"] = iSize
-        lRows.append(dRow)
-    return lRows
+    return [
+        benchmark_pair(lPattern, lFilterA, lFilterB, iRepeats=iRepeats)
+        for _, lPattern, lFilterA, lFilterB in lCases
+    ]
 
 
 def format_benchmark_table(lRows: list[dict[str, float | int]]) -> str:
     """성능 행 목록을 콘솔 표 문자열로 변환한다."""
     lColumns = ("크기(N×N)", "A 평균(ms)", "B 평균(ms)", "합계 평균(ms)", "연산 횟수(N²)")
-    sRowLeftPad = " "
-    lWidths = [8, 10, 10, 12, 11]
-    lFormattedRows: list[tuple[str, str, str, str, str]] = []
-    for dRow in lRows:
-        iSize = int(dRow["size"])
-        fAvgA = float(dRow["avg_a_ms"])
-        fAvgB = float(dRow["avg_b_ms"])
-        fAvgTotal = float(dRow["avg_total_ms"])
-        iOpsN2 = int(dRow["ops_n2"])
-        lFormattedRows.append(
-            (
-                f"{iSize}x{iSize}",
-                f"{fAvgA:.6f}",
-                f"{fAvgB:.6f}",
-                f"{fAvgTotal:.6f}",
-                str(iOpsN2),
-            ),
+    lFormattedRows = [
+        (
+            f"{int(d['size'])}x{int(d['size'])}",
+            f"{d['avg_a_ms']:.6f}",
+            f"{d['avg_b_ms']:.6f}",
+            f"{d['avg_total_ms']:.6f}",
+            str(int(d["ops_n2"])),
         )
+        for d in lRows
+    ]
 
-    for iIdx, sColumn in enumerate(lColumns):
-        lWidths[iIdx] = max(lWidths[iIdx], len(sColumn))
-    for tRow in lFormattedRows:
-        for iIdx, sValue in enumerate(tRow):
-            lWidths[iIdx] = max(lWidths[iIdx], len(sValue))
+    lAllRows = [lColumns, *lFormattedRows]
+    lWidths = [max(len(row[i]) for row in lAllRows) for i in range(len(lColumns))]
 
     sHeader = " | ".join(lColumns)
     sSeparator = "-" * (len(sHeader) + 14)
     lLines = [sHeader, sSeparator]
-    for sSize, sAvgA, sAvgB, sAvgTotal, sOpsN2 in lFormattedRows:
+    for tRow in lFormattedRows:
         lLines.append(
-            sRowLeftPad
+            " "
             + " | ".join(
-                [
-                    sSize.ljust(lWidths[0]),
-                    sAvgA.rjust(lWidths[1]),
-                    sAvgB.rjust(lWidths[2]),
-                    sAvgTotal.rjust(lWidths[3]),
-                    sOpsN2.rjust(lWidths[4]),
-                ]
+                sVal.ljust(lWidths[i]) if i == 0 else sVal.rjust(lWidths[i])
+                for i, sVal in enumerate(tRow)
             )
         )
     return "\n".join(lLines)

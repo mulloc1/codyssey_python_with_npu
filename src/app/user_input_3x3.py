@@ -6,8 +6,8 @@ import time
 
 from src.npu.benchmark import build_benchmark_rows, format_benchmark_table
 from src.npu.constants import DEFAULT_EPSILON, LABEL_UNDECIDED
-from src.npu.judgement import judge_ab
-from src.npu.mac import compute_mac, validate_mac_inputs
+from src.npu.judgement import judge
+from src.npu.mac import compute_mac
 from src.npu_io.parse import parse_row
 
 
@@ -40,29 +40,14 @@ def run_user_input_mode_3x3() -> None:
             print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
             return
 
-        try:
-            # 필터마다 패턴과의 형상을 검증한 뒤, 반환된 N이 서로 같은지 한 번 더 본다.
-            iSizeA = validate_mac_inputs(lPattern, lFilterA)
-            iSizeB = validate_mac_inputs(lPattern, lFilterB)
-            if iSizeA != iSizeB:
-                raise ValueError(
-                    "MAC square size mismatch across filters after validation",
-                )
-        except ValueError as exc:
-            print(f"\n[입력 검증 오류] {exc}")
-            print(
-                "패턴과 필터의 행·열 크기가 서로 같은지 확인한 뒤, 처음부터 다시 입력해 주세요.",
-            )
-            continue
-
-        iSize = iSizeA
+        iSize = 3
         fStart = time.perf_counter()
         fScoreA = compute_mac(lPattern, lFilterA, iSize)
         fScoreB = compute_mac(lPattern, lFilterB, iSize)
         fEnd = time.perf_counter()
         fElapsedMs = (fEnd - fStart) * 1000.0
 
-        sVerdict = judge_ab(fScoreA, fScoreB, fEpsilon=DEFAULT_EPSILON)
+        sVerdict = judge(fScoreA, fScoreB, "A", "B", fEpsilon=DEFAULT_EPSILON)
         sVerdictDisplay = "판정 불가" if sVerdict == LABEL_UNDECIDED else sVerdict
 
         print("\n--- 결과 ---")
