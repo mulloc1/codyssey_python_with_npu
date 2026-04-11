@@ -23,7 +23,9 @@ python_with_npu/
 | 경로 | 역할 |
 |------|------|
 | `main.py` | `console_flow.main()`을 호출하는 진입점 |
-| `src/app/console_flow.py` | 메뉴(3×3 수동 입력 / `data.json` 분석), MAC·판정·벤치 출력 흐름 |
+| `src/app/console_flow.py` | 메인 메뉴·모드 라우팅(`run_main_menu`, `main`) |
+| `src/app/user_input_3x3.py` | 3×3 수동 입력 모드(MAC·판정·소형 성능 표) |
+| `src/app/data_json_mode.py` | `data.json` 분석 모드(케이스별 출력·요약·성능 표) |
 | `src/app/report.py` | JSON 모드 종료 시 통과·실패 요약 문자열 생성 |
 | `src/app/constants.py` | 메뉴 선택값 등 앱 상수 |
 | `src/npu/mac.py` | MAC 누적 연산: `validate_mac_inputs`, 순수 `compute_mac(pattern, filter, size)`, 검증 포함 `compute_mac_checked` |
@@ -38,7 +40,7 @@ python_with_npu/
 | `src/npu_io/parse.py` | 콘솔 한 줄·행 단위 입력 파싱 |
 | `src/npu_io/label_normalization.py` | JSON 쪽 raw 필터 키·expected와의 정규화 조합 |
 | `tests/` | 위 모듈별 단위 테스트 |
-| `docs/` | 구현 체크리스트, 네이밍, 과제 설명 등 참고 문서 |
+| `docs/` | 구현 체크리스트, 네이밍, [함수 작성 가이드](docs/app_layer_functions.md) 등 |
 
 ## `data.json` 구조
 

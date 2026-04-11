@@ -20,7 +20,7 @@
 
 - **N 추출**: [`src/npu_io/schema.py`](../../src/npu_io/schema.py)의 `extract_size_from_pattern_key`가 정규식 `^size_(\d+)_(\d+)$`로 패턴 키(예: `size_13_002`)의 **첫 번째 숫자 그룹**을 `N`으로 파싱한다. 형식이 맞지 않으면 즉시 `ValueError`로 실패시켜 잘못된 키가 조용히 넘어가지 않게 했다.
 - **필터 선택**: 같은 모듈의 `select_filters_for_size`가 `filters` 객체에서 키 문자열 `f"size_{iSize}"`로 조회한다. `patterns`에서 나온 `N`과 동일한 정수로 맞추므로, “패턴이 요구하는 크기”와 “로드할 필터 묶음”이 한 축으로 정렬된다.
-- **그 다음**: `console_flow`에서 추출한 `N`으로 위 맵을 고른 뒤, `validate_pattern_and_filters`로 `input` 행렬과 필터 행렬이 모두 `N×N`인지 한 번에 검증한다. 키 파싱·조회·형상 검증이 역할별 함수로 쪼개져 있어 테스트와 오류 메시지 해석이 쉬워진다.
+- **그 다음**: `data_json_mode` 루프에서 추출한 `N`으로 위 맵을 고른 뒤, `validate_pattern_and_filters`로 `input` 행렬과 필터 행렬이 모두 `N×N`인지 한 번에 검증한다. 키 파싱·조회·형상 검증이 역할별 함수로 쪼개져 있어 테스트와 오류 메시지 해석이 쉬워진다.
 
 ### 라벨 정규화를 별도 함수·모듈로 둔 이유와 장점
 
@@ -42,7 +42,7 @@
 문항의 “VO”는 **입출력(I/O)** 을 뜻하는 것으로 이해하고 정리한다(파일 읽기, `print`, 사용자 입력 등은 타이머 밖).
 
 - **벤치마크**([`src/npu/benchmark.py`](../../src/npu/benchmark.py)): `benchmark_mac_average`에서 `validate_mac_inputs`는 **타이머 시작 전**에 한 번 호출되고, `perf_counter` 구간 안에는 **`compute_mac`만** 들어간다. 반복마다 검증 비용을 섞지 않아 “MAC 본체”에 가까운 시간만 평균 낸다.
-- **콘솔·JSON 모드의 한 줄 시간**([`console_flow.py`](../../src/app/console_flow.py)): `fStart`~`fEnd`는 **두 번의 `compute_mac`(A/B 또는 Cross/X)** 만 포함한다. 그 앞의 `validate_mac_inputs`, 그 뒤의 `judge_ab` / `judge_cross_vs_x`는 구간 밖이다. 따라서 출력되는 ms는 “판정까지 전부”가 아니라 **MAC 연산 위주**에 가깝다.
+- **콘솔·JSON 모드의 한 줄 시간**([`user_input_3x3.py`](../../src/app/user_input_3x3.py), [`data_json_mode.py`](../../src/app/data_json_mode.py)): `fStart`~`fEnd`는 **두 번의 `compute_mac`(A/B 또는 Cross/X)** 만 포함한다. 그 앞의 `validate_mac_inputs`, 그 뒤의 `judge_ab` / `judge_cross_vs_x`는 구간 밖이다. 따라서 출력되는 ms는 “판정까지 전부”가 아니라 **MAC 연산 위주**에 가깝다.
 
 완전히 순수 연산만 남기려면 벤치 쪽 정의(위와 같음)를 기준으로 설명하는 것이 맞다.
 
@@ -103,7 +103,7 @@ Python의 `float`는 대부분의 환경에서 **IEEE 754 배정밀도(binary64)
 2. **정규화**: [`src/npu/labels.py`](../../src/npu/labels.py)의 맵에 raw 문자열 → 표준 라벨. JSON 조합이 필요하면 [`label_normalization.py`](../../src/npu_io/label_normalization.py) 시그니처·호출부 정리.
 3. **판정**: 지금은 이진 비교(`judge_cross_vs_x`) 또는 A/B(`judge_ab`)다. 새 라벨이 **세 번째 후보와 점수 비교**를 요구하면 판정 함수를 다중 비교나 argmax 형태로 확장하고, epsilon·동률 규칙을 명문화한다.
 4. **데이터 스키마**: `filters`에 해당 크기의 새 키 행렬이 필요한지, `patterns.expected` 허용 값 목록을 README·스키마 검증에 반영.
-5. **출력·스트**: `console_flow`의 한 줄 포맷, `summarize_results` 실패 사유 문자열, 필요 시 리포트 섹션 문구.
+5. **출력·스트**: `data_json_mode`의 한 줄 포맷, `summarize_results` 실패 사유 문자열, 필요 시 리포트 섹션 문구.
 6. **테스트**: `test_labels`, `test_judgement`, JSON 통합 경로에 케이스 추가.
 
 ### 1000×1000 패턴일 때 시간·메모리와 우선 최적화
@@ -134,6 +134,6 @@ Python의 `float`는 대부분의 환경에서 **IEEE 754 배정밀도(binary64)
 | MAC 본체 | `src/npu/mac.py` |
 | 판정·epsilon | `src/npu/judgement.py`, `src/npu/constants.py` |
 | 패턴 키·size_N | `src/npu_io/schema.py` |
-| JSON 흐름 | `src/app/console_flow.py` |
+| JSON 흐름 | `src/app/data_json_mode.py` |
 | 벤치 타이머 경계 | `src/npu/benchmark.py` |
 | 라벨 정규화 | `src/npu/labels.py`, `src/npu_io/label_normalization.py` |

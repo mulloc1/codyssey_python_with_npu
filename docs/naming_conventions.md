@@ -44,7 +44,7 @@
 - 파일 경로를 `Path` 객체로 다룰 때는 `p` 접두사를 사용한다.
   - 예: `pFilePath = Path(sPath)`
 - 함수(콜러블) 참조를 담는 변수는 `fn` 접두사를 사용한다.
-  - 예: `fnReader = input_fn or input`
+  - 예: `fnKey = str.casefold`
 
 ---
 
