@@ -17,6 +17,11 @@ class TestNormalizeExpectedAndFilterKey(unittest.TestCase):
         self.assertEqual(sNormalizedExpected, LABEL_CROSS)
         self.assertEqual(sNormalizedFilter, LABEL_CROSS)
 
+    def test_normalizes_mixed_case_aliases_via_labels(self) -> None:
+        sNormalizedExpected, sNormalizedFilter = normalize_expected_and_filter_key("x", "CROSS")
+        self.assertEqual(sNormalizedExpected, LABEL_X)
+        self.assertEqual(sNormalizedFilter, LABEL_CROSS)
+
 
 class TestNormalizeFilterScoreKeys(unittest.TestCase):
     def test_normalizes_score_map_keys_to_standard_labels(self) -> None:
