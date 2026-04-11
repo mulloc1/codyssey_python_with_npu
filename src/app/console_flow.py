@@ -15,7 +15,7 @@ from src.npu.benchmark import (
 from src.npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_UNDECIDED, LABEL_X
 from src.npu.judgement import judge_ab, judge_cross_vs_x
 from src.npu.labels import normalize_expected
-from src.npu.mac import compute_mac
+from src.npu.mac import compute_mac, validate_mac_inputs
 from src.npu_io.json_loader import iter_pattern_cases, load_json
 from src.npu_io.label_normalization import normalize_expected_and_filter_key
 from src.npu_io.parse import parse_row, read_square_matrix_lines
@@ -93,9 +93,15 @@ def run_user_input_mode_3x3(reader: Callable[[str], str] | None = None) -> None:
         print("\n\n입력이 중단되어 메인 메뉴로 돌아갑니다.")
         return
 
+    # 필터마다 패턴과의 형상을 검증한 뒤, 반환된 N이 서로 같은지 한 번 더 본다.
+    iSizeA = validate_mac_inputs(lPattern, lFilterA)
+    iSizeB = validate_mac_inputs(lPattern, lFilterB)
+    if iSizeA != iSizeB:
+        raise ValueError("MAC square size mismatch across filters after validation")
+    iSize = iSizeA
     fStart = time.perf_counter()
-    fScoreA = compute_mac(lPattern, lFilterA)
-    fScoreB = compute_mac(lPattern, lFilterB)
+    fScoreA = compute_mac(lPattern, lFilterA, iSize)
+    fScoreB = compute_mac(lPattern, lFilterB, iSize)
     fEnd = time.perf_counter()
     fElapsedMs = (fEnd - fStart) * 1000.0
 
@@ -178,9 +184,14 @@ def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
             if LABEL_CROSS not in dNormalizedFilters or LABEL_X not in dNormalizedFilters:
                 raise ValueError("both Cross and X filters are required for each size")
 
+            iMacCross = validate_mac_inputs(lPatternInput, dNormalizedFilters[LABEL_CROSS])
+            iMacX = validate_mac_inputs(lPatternInput, dNormalizedFilters[LABEL_X])
+            if iMacCross != iMacX:
+                raise ValueError("MAC square size mismatch across filters after validation")
+            iMacSize = iMacCross
             fStart = time.perf_counter()
-            fScoreCross = compute_mac(lPatternInput, dNormalizedFilters[LABEL_CROSS])
-            fScoreX = compute_mac(lPatternInput, dNormalizedFilters[LABEL_X])
+            fScoreCross = compute_mac(lPatternInput, dNormalizedFilters[LABEL_CROSS], iMacSize)
+            fScoreX = compute_mac(lPatternInput, dNormalizedFilters[LABEL_X], iMacSize)
             fEnd = time.perf_counter()
             fElapsedMs = (fEnd - fStart) * 1000.0
 
