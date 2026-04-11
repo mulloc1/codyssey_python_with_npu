@@ -40,7 +40,7 @@ python_with_npu/
 | `src/npu_io/parse.py` | 콘솔 한 줄·행 단위 입력 파싱 |
 | `src/npu_io/label_normalization.py` | JSON 쪽 raw 필터 키·expected와의 정규화 조합 |
 | `tests/` | 위 모듈별 단위 테스트 |
-| `docs/` | 구현 체크리스트, 네이밍, [함수 작성 가이드](docs/app_layer_functions.md) 등 |
+| `docs/` | 구현 체크리스트, 네이밍, [함수 작성 가이드](docs/function_conventions.md) 등 |
 
 ## `data.json` 구조
 

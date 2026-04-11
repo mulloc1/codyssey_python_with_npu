@@ -13,10 +13,9 @@ from src.npu.benchmark import (
 )
 from src.npu.constants import DEFAULT_EPSILON, LABEL_CROSS, LABEL_X
 from src.npu.judgement import judge_cross_vs_x
-from src.npu.labels import normalize_expected
+from src.npu.labels import normalize_expected, normalize_filter_key
 from src.npu.mac import compute_mac, validate_mac_inputs
 from src.npu_io.json_loader import iter_pattern_cases, load_json
-from src.npu_io.label_normalization import normalize_expected_and_filter_key
 from src.npu_io.schema import (
     extract_size_from_pattern_key,
     select_filters_for_size,
@@ -72,17 +71,13 @@ def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
             for sRawFilterKey, lFilterMatrix in dRawFilters.items():
                 if not isinstance(sRawFilterKey, str):
                     raise ValueError("filter key must be a string")
-                # 입력: raw_filter_key="cross"
-                # 반환: normalized_filter_key="Cross"
-                _, sNormalizedFilterKey = normalize_expected_and_filter_key(sExpectedRaw, sRawFilterKey)
+                sNormalizedFilterKey = normalize_filter_key(sRawFilterKey)
                 if sNormalizedFilterKey in dNormalizedFilters:
                     raise ValueError(
                         f"duplicate normalized filter label: {sNormalizedFilterKey}",
                     )
                 dNormalizedFilters[sNormalizedFilterKey] = lFilterMatrix
 
-            # 입력: expected_raw="+"
-            # 반환: normalized_expected="Cross"
             sNormalizedExpected = normalize_expected(sExpectedRaw)
             validate_pattern_and_filters(
                 lPatternInput=lPatternInput,
@@ -105,8 +100,6 @@ def run_data_json_mode(sDataPath: str | Path | None = None) -> None:
             fElapsedMs = (fEnd - fStart) * 1000.0
 
             sVerdict = judge_cross_vs_x(fScoreCross, fScoreX, fEpsilon=DEFAULT_EPSILON)
-            # 입력: verdict="Cross", normalized_expected="Cross"
-            # 반환: pass_fail="PASS"
             sPassFail = "PASS" if sVerdict == sNormalizedExpected else "FAIL"
             if sPassFail == "PASS":
                 iPassed += 1
